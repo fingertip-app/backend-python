@@ -2,6 +2,12 @@
 
 FastAPI 기반 API 서버 골격입니다. 기획서 기준 핵심 범위는 회원/장인/체험/예약/후기/카드뉴스/AI RAG/관리자 기능입니다.
 
+## Version
+
+- App version: `0.1.0`
+- Python: `3.11+`
+- API status: 초기 스캐폴드
+
 ## Stack
 
 - FastAPI, Pydantic v2
