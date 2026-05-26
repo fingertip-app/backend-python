@@ -8,7 +8,9 @@ class Settings(BaseSettings):
     app_env: str = "local"
     database_url: str = "postgresql+psycopg://fingertip:fingertip@localhost:5432/fingertip"
     redis_url: str = "redis://localhost:6379/0"
-    jwt_secret: str = "change-me"
+    jwt_secret: str = "change-me-to-a-32-byte-local-secret"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60 * 24
     openai_api_key: str = ""
 
 
