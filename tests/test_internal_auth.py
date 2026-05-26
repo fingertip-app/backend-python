@@ -10,6 +10,11 @@ def client():
     return TestClient(app)
 
 
+@pytest.fixture(autouse=True)
+def configured_internal_api_key(monkeypatch):
+    monkeypatch.setattr(settings, "internal_api_key", "test-internal-key")
+
+
 def test_health_without_auth(client):
     """Health endpoint should not require authentication."""
     response = client.get("/health")
@@ -47,3 +52,14 @@ def test_ai_explain_valid_key(client):
     assert "answer" in data
     assert "sources" in data
     assert "recommendedExperienceIds" in data
+
+
+def test_ai_explain_rejects_unconfigured_internal_key(client, monkeypatch):
+    monkeypatch.setattr(settings, "internal_api_key", "")
+    response = client.post(
+        "/api/v1/ai/explain",
+        json={"query": "test"},
+        headers={"X-Internal-Api-Key": ""},
+    )
+    assert response.status_code == 503
+    assert "not configured" in response.json()["detail"]
