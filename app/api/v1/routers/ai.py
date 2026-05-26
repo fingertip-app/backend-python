@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-router = APIRouter()
+from app.core.security import verify_internal_api_key
+
+router = APIRouter(dependencies=[Depends(verify_internal_api_key)])
 
 
 class ExplainRequest(BaseModel):

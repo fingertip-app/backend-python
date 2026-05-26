@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     jwt_secret: str = "change-me"
     openai_api_key: str = ""
+    internal_api_key: str = ""
 
 
 settings = Settings()
