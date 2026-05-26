@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     jwt_secret: str = "change-me"
     openai_api_key: str = ""
+    openai_embedding_model: str = "text-embedding-3-small"
+    openai_generation_model: str = "gpt-4o-mini"
+    rag_top_k: int = 5
     internal_api_key: str = ""
 
 

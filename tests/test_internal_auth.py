@@ -3,6 +3,17 @@ from fastapi.testclient import TestClient
 
 from app.core.config import settings
 from app.main import app
+from app.services.ai.rag import get_culture_rag_service
+
+
+class StubCultureRagService:
+    def explain(self, db, query: str, locale: str) -> dict[str, object]:
+        return {
+            "answer": f"{query}:{locale}",
+            "sources": [],
+            "matchingKeywords": [],
+            "recommendedCategories": [],
+        }
 
 
 @pytest.fixture
@@ -13,6 +24,9 @@ def client():
 @pytest.fixture(autouse=True)
 def configured_internal_api_key(monkeypatch):
     monkeypatch.setattr(settings, "internal_api_key", "test-internal-key")
+    app.dependency_overrides[get_culture_rag_service] = lambda: StubCultureRagService()
+    yield
+    app.dependency_overrides.clear()
 
 
 def test_health_without_auth(client):
@@ -51,7 +65,8 @@ def test_ai_explain_valid_key(client):
     data = response.json()
     assert "answer" in data
     assert "sources" in data
-    assert "recommendedExperienceIds" in data
+    assert "matchingKeywords" in data
+    assert "recommendedCategories" in data
 
 
 def test_ai_explain_rejects_unconfigured_internal_key(client, monkeypatch):
