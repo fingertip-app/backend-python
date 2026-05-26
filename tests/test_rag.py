@@ -67,6 +67,8 @@ def test_explain_retrieves_sources_and_generates_answer(monkeypatch):
     assert result["sources"] == [
         {"id": 7, "name": "매듭장", "source": "국가유산포털", "category": "공예"}
     ]
+    assert result["matchingKeywords"] == ["매듭장"]
+    assert result["recommendedCategories"] == ["공예"]
     assert client.embeddings.call["model"] == "embedding-model"
     assert "매듭이 뭐예요?" in client.responses.call["input"]
     assert client.responses.call["model"] == "generation-model"
@@ -79,7 +81,8 @@ def test_explain_does_not_generate_answer_without_sources():
     result = service.explain(FakeDb([]), "없는 질문", "ko")
 
     assert result["sources"] == []
-    assert result["recommendedExperienceIds"] == []
+    assert result["matchingKeywords"] == []
+    assert result["recommendedCategories"] == []
     assert client.responses.call is None
 
 

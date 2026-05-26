@@ -29,7 +29,8 @@ class CultureRagService:
             return {
                 "answer": "관련 문화유산 자료를 찾지 못했습니다. 질문을 더 구체적으로 입력해 주세요.",
                 "sources": [],
-                "recommendedExperienceIds": [],
+                "matchingKeywords": [],
+                "recommendedCategories": [],
             }
 
         context = "\n\n".join(
@@ -53,7 +54,8 @@ class CultureRagService:
         return {
             "answer": response.output_text,
             "sources": sources,
-            "recommendedExperienceIds": [],
+            "matchingKeywords": self._matching_keywords(items),
+            "recommendedCategories": self._categories(items),
         }
 
     def _embed(self, query: str) -> list[float]:
@@ -81,6 +83,14 @@ class CultureRagService:
             "source": item.source,
             "category": item.category,
         }
+
+    @staticmethod
+    def _matching_keywords(items: list[HeritageItem]) -> list[str]:
+        return list(dict.fromkeys(item.name for item in items if item.name))
+
+    @staticmethod
+    def _categories(items: list[HeritageItem]) -> list[str]:
+        return list(dict.fromkeys(item.category for item in items if item.category))
 
 
 def get_culture_rag_service() -> CultureRagService:

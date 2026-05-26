@@ -26,7 +26,8 @@ class SourceResponse(BaseModel):
 class ExplainResponse(BaseModel):
     answer: str
     sources: list[SourceResponse]
-    recommendedExperienceIds: list[int]
+    matchingKeywords: list[str]
+    recommendedCategories: list[str]
 
 
 @router.post("/explain", response_model=ExplainResponse)

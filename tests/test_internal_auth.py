@@ -11,7 +11,8 @@ class StubCultureRagService:
         return {
             "answer": f"{query}:{locale}",
             "sources": [],
-            "recommendedExperienceIds": [],
+            "matchingKeywords": [],
+            "recommendedCategories": [],
         }
 
 
@@ -64,7 +65,8 @@ def test_ai_explain_valid_key(client):
     data = response.json()
     assert "answer" in data
     assert "sources" in data
-    assert "recommendedExperienceIds" in data
+    assert "matchingKeywords" in data
+    assert "recommendedCategories" in data
 
 
 def test_ai_explain_rejects_unconfigured_internal_key(client, monkeypatch):

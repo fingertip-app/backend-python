@@ -98,6 +98,8 @@ pytest
 - `POST /api/v1/ai/explain`
 - 구현 대상: `POST /api/v1/ai/translate`, `POST /api/v1/ai/reviews/summarize`, 임베딩 적재 배치 엔드포인트
 
-현재 존재하는 인증, 체험, 카드뉴스, 예약 스캐폴드 라우트는 v4 책임 범위에 포함되지 않습니다. 신규 앱 연동 대상으로 확장하지 않고, Spring 외부 API로 이전하거나 AI 구현 과정에서 정리합니다.
+`POST /api/v1/ai/explain`은 해설과 출처에 더해 `matchingKeywords`, `recommendedCategories`를 반환합니다. 실제 체험 조회와 ID 매핑은 Spring 메인 API가 자기 데이터에서 수행합니다.
+
+인증, 체험, 카드뉴스, 예약 등 앱 외부 API 라우트와 서비스 도메인 모델은 v4 책임 범위에서 제거했습니다. FastAPI migration은 `heritage_items`와 vector 검색 인덱스만 관리합니다. 기존 초기 migration을 적용한 개발 DB가 있다면 AI DB를 재생성한 뒤 새 baseline을 적용해야 합니다.
 
 세부 구현 항목과 2026-06-28 완료 일정은 [TODO.md](./TODO.md)를 기준으로 진행합니다.
