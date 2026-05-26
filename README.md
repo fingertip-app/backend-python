@@ -1,37 +1,41 @@
-# 장인과 하루 Backend
+# 장인과 하루 FastAPI AI Server
 
-FastAPI 기반 API 서버 골격입니다. 기획서 기준 핵심 범위는 회원/장인/체험/예약/후기/카드뉴스/AI RAG/관리자 기능입니다.
+FastAPI 기반 내부 AI 서버 골격입니다. 기획서 v4 기준으로 앱에 직접 노출되지 않으며, Spring Boot 메인 API 서버(`../backend`)가 내부 HTTP로 호출합니다.
+
+## Responsibility Boundary
+
+- 담당: 공공데이터 ETL, 임베딩/pgvector 검색, 문화 해설 RAG, 관련 체험 매칭, 번역, 후기 요약, 카드뉴스 AI 지원
+- 비담당: 사용자 인증, 장인 승인, 예약 상태 전이, 결제 webhook, 앱 외부 API, 사용자 알림
+- 데이터 정책: AI 벡터/ETL 스키마는 이 서버가 관리하고, 서비스 트랜잭션 데이터의 변경은 Spring API를 통해 처리합니다.
 
 ## Version
 
 - App version: `0.1.0`
 - Python: `3.11+`
-- API status: 초기 스캐폴드
+- API status: 내부 AI API 초기 스캐폴드
 
 ## Stack
 
 - FastAPI, Pydantic v2
 - PostgreSQL + pgvector
 - SQLAlchemy 2.x + Alembic
-- Celery + Redis
+- Redis (필요 시 AI 배치/캐시)
 - OpenAI API, LangChain
-- Toss Payments webhook
-- AWS S3, SES, Kakao AlimTalk
 
 ## Local Setup
 
 ```bash
 cp .env.example .env
-docker compose up -d
+(cd ../backend && docker compose up -d)
 uvicorn app.main:app --reload
 ```
 
 ## Docker 사용 위치
 
-초기 개발에서 Docker는 FastAPI 앱 자체보다 의존 인프라를 띄우는 데 사용합니다.
+초기 개발에서 Docker는 FastAPI 앱 자체보다 AI 의존 인프라를 띄우는 데 사용합니다. Spring이 사용하는 서비스 DB와 충돌하지 않도록 공용 PostgreSQL/Redis 구성은 `../backend/docker-compose.yml`을 기준으로 맞춥니다.
 
-- `postgres`: PostgreSQL + pgvector. 서비스 데이터와 RAG 벡터 데이터를 저장합니다.
-- `redis`: Celery 작업 큐, 임베딩/번역/알림 같은 비동기 작업에 사용합니다.
+- `postgres`: PostgreSQL + pgvector. RAG 벡터 데이터와 연동 조회에 사용합니다.
+- `redis`: 임베딩/번역/요약 배치나 캐시가 필요할 때 사용합니다.
 
 FastAPI 서버는 우선 로컬 Python 환경에서 실행합니다. 디버깅이 쉽고 코드 변경 반영이 빠르기 때문입니다. 배포/CI 단계에서 필요하면 FastAPI 서버용 `Dockerfile`을 추가합니다.
 
@@ -47,27 +51,26 @@ cp .env.example .env
 
 - `DATABASE_URL`: 로컬 Docker PostgreSQL 연결 문자열
 - `REDIS_URL`: 로컬 Docker Redis 연결 문자열
-- `JWT_SECRET`: 로컬 개발용 임의 문자열
 - `OPENAI_API_KEY`: AI/RAG 기능 구현 시 필요
-- `TOSS_SECRET_KEY`, `TOSS_WEBHOOK_SECRET`: 결제 구현 시 필요
+- `INTERNAL_API_KEY`: Spring 내부 호출 인증이 필요할 때 사용할 서버 간 키
 
 ### 2. DB/Redis 실행
 
 ```bash
-docker compose up -d
-docker compose ps
+(cd ../backend && docker compose up -d)
+(cd ../backend && docker compose ps)
 ```
 
 중지:
 
 ```bash
-docker compose down
+(cd ../backend && docker compose down)
 ```
 
 데이터까지 모두 삭제:
 
 ```bash
-docker compose down -v
+(cd ../backend && docker compose down -v)
 ```
 
 ### 3. API 서버 실행
@@ -89,12 +92,12 @@ python -m compileall app
 pytest
 ```
 
-## Initial Routes
+## Internal Routes
 
 - `GET /health`
-- `GET /api/v1/experiences`
-- `GET /api/v1/cardnews`
 - `POST /api/v1/ai/explain`
-- `POST /api/v1/bookings`
+- 구현 대상: `POST /api/v1/ai/translate`, `POST /api/v1/ai/reviews/summarize`, 임베딩 적재 배치 엔드포인트
 
-세부 구현 항목은 [TODO.md](./TODO.md)를 기준으로 나눠 진행합니다.
+현재 존재하는 인증, 체험, 카드뉴스, 예약 스캐폴드 라우트는 v4 책임 범위에 포함되지 않습니다. 신규 앱 연동 대상으로 확장하지 않고, Spring 외부 API로 이전하거나 AI 구현 과정에서 정리합니다.
+
+세부 구현 항목과 2026-06-28 완료 일정은 [TODO.md](./TODO.md)를 기준으로 진행합니다.
