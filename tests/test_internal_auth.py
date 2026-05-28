@@ -5,11 +5,7 @@ from app.api.v1 import deps
 from app.core.config import settings
 from app.main import app
 from app.services.ai.rag import get_culture_rag_service
-
-
-class HealthyDb:
-    def execute(self, statement):
-        return None
+from tests.conftest import HealthyDb
 
 
 class StubCultureRagService:

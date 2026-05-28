@@ -2,11 +2,7 @@ from fastapi.testclient import TestClient
 
 from app.api.v1 import deps
 from app.main import app
-
-
-class HealthyDb:
-    def execute(self, statement):
-        return None
+from tests.conftest import HealthyDb
 
 
 class FailingDb:
@@ -23,19 +19,19 @@ def override_db(db):
 
 def test_health() -> None:
     app.dependency_overrides[deps.get_db] = override_db(HealthyDb())
-    client = TestClient(app)
-    response = client.get("/health")
-    app.dependency_overrides.clear()
-
-    assert response.status_code == 200
-    assert response.json() == {"status": "ok", "db": "ok"}
+    try:
+        response = TestClient(app).get("/health")
+        assert response.status_code == 200
+        assert response.json() == {"status": "ok", "db": "ok"}
+    finally:
+        app.dependency_overrides.clear()
 
 
 def test_health_degraded_when_db_fails() -> None:
     app.dependency_overrides[deps.get_db] = override_db(FailingDb())
-    client = TestClient(app)
-    response = client.get("/health")
-    app.dependency_overrides.clear()
-
-    assert response.status_code == 503
-    assert response.json() == {"status": "degraded", "db": "error"}
+    try:
+        response = TestClient(app).get("/health")
+        assert response.status_code == 503
+        assert response.json() == {"status": "degraded", "db": "error"}
+    finally:
+        app.dependency_overrides.clear()
