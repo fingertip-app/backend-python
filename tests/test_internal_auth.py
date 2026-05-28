@@ -1,9 +1,15 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from app.api.v1 import deps
 from app.core.config import settings
 from app.main import app
 from app.services.ai.rag import get_culture_rag_service
+
+
+class HealthyDb:
+    def execute(self, statement):
+        return None
 
 
 class StubCultureRagService:
@@ -31,9 +37,13 @@ def configured_internal_api_key(monkeypatch):
 
 def test_health_without_auth(client):
     """Health endpoint should not require authentication."""
+    def override_db():
+        yield HealthyDb()
+
+    app.dependency_overrides[deps.get_db] = override_db
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    assert response.json() == {"status": "ok", "db": "ok"}
 
 
 def test_ai_explain_missing_header(client):
