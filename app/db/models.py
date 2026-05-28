@@ -1,10 +1,18 @@
 from datetime import datetime
+from enum import Enum as PyEnum
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
+
+
+class EmbeddingStatus(str, PyEnum):
+    PENDING = "pending"
+    DONE = "done"
+    FAILED = "failed"
+
 
 class HeritageItem(Base):
     __tablename__ = "heritage_items"
@@ -19,7 +27,7 @@ class HeritageItem(Base):
     embedding = Column(Vector(1536))
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    
+
     vector_documents = relationship("VectorDocument", back_populates="heritage_item", cascade="all, delete-orphan")
 
 
@@ -35,14 +43,18 @@ class VectorDocument(Base):
 
     heritage_item = relationship("HeritageItem", back_populates="vector_documents")
 
+    __table_args__ = (
+        Index('ix_vector_documents_heritage_item_id', 'heritage_item_id'),
+    )
+
 
 class EmbeddingMetadata(Base):
     __tablename__ = "embedding_metadata"
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    target_table = Column(String(100), nullable=False)   # "heritage_items" or "vector_documents"
+    target_table = Column(String(100), nullable=False)
     target_id = Column(BigInteger, nullable=False)
-    status = Column(String(20), nullable=False, default="pending")  # pending / done / failed
+    status = Column(String(20), nullable=False, default=EmbeddingStatus.PENDING.value)
     error_message = Column(Text)
     embedded_at = Column(DateTime)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
