@@ -92,6 +92,14 @@ python -m compileall app
 pytest
 ```
 
+### 5. DB 마이그레이션 적용
+새 마이그레이션이 머지된 경우 반드시 실행해야 합니다.
+```bash
+alembic upgrade head
+```
+PR 머지 후 로컬에서 실행하지 않으면 테이블 구조가 맞지 않아 서버가 정상 동작하지 않습니다.
+
+
 ## Internal Routes
 
 - `GET /health`
