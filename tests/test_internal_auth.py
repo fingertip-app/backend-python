@@ -33,13 +33,14 @@ def configured_internal_api_key(monkeypatch):
 
 def test_health_without_auth(client):
     """Health endpoint should not require authentication."""
-    def override_db():
-        yield HealthyDb()
-
-    app.dependency_overrides[deps.get_db] = override_db
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert response.json() == {"status": "ok", "db": "ok"}
+    # health check는 DB 접근 필요 (SELECT 1 실행)
+    app.dependency_overrides[deps.get_db] = lambda: HealthyDb()
+    try:
+        response = client.get("/health")
+        assert response.status_code == 200
+        assert response.json() == {"status": "ok", "db": "ok"}
+    finally:
+        app.dependency_overrides.pop(deps.get_db, None)
 
 
 def test_ai_explain_missing_header(client):
