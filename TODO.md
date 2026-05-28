@@ -16,7 +16,7 @@
 ### 5/27 - 5/31: 서버 역할과 데이터 계약 동결
 
 - [x] [영진] Spring-FastAPI 내부 API 계약 확정: request/response, 오류, timeout, 인증 방식
-- [ ] [서영] AI 소유 테이블/인덱스 확정: heritage_items, vector_documents, embedding metadata
+- [x] [서영] AI 소유 테이블/인덱스 확정: heritage_items, vector_documents, embedding metadata
 - [ ] [서영] 공공데이터 원천과 MVP 적재 범위 확정: 국가무형유산 종목 설명과 보유자 기본 정보 우선
 - [x] [공통] 기존 bookings/cardnews/experiences 외부 API 스캐폴드와 서비스 도메인 모델 제거
 
