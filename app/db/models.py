@@ -1,9 +1,17 @@
 from datetime import datetime
+from enum import Enum as PyEnum
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import BigInteger, Column, DateTime, String, Text
+from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy.orm import relationship
 
 from app.db.base import Base
+
+
+class EmbeddingStatus(str, PyEnum):
+    PENDING = "pending"
+    DONE = "done"
+    FAILED = "failed"
 
 
 class HeritageItem(Base):
@@ -19,3 +27,34 @@ class HeritageItem(Base):
     embedding = Column(Vector(1536))
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    vector_documents = relationship("VectorDocument", back_populates="heritage_item", cascade="all, delete-orphan")
+
+
+class VectorDocument(Base):
+    __tablename__ = "vector_documents"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    heritage_item_id = Column(BigInteger, ForeignKey("heritage_items.id", ondelete="CASCADE"), nullable=False)
+    chunk_index = Column(Integer, nullable=False)
+    content = Column(Text, nullable=False)
+    embedding = Column(Vector(1536))
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    heritage_item = relationship("HeritageItem", back_populates="vector_documents")
+
+    __table_args__ = (
+        Index('ix_vector_documents_heritage_item_id', 'heritage_item_id'),
+    )
+
+
+class EmbeddingMetadata(Base):
+    __tablename__ = "embedding_metadata"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    target_table = Column(String(100), nullable=False)
+    target_id = Column(BigInteger, nullable=False)
+    status = Column(String(20), nullable=False, default=EmbeddingStatus.PENDING.value)
+    error_message = Column(Text)
+    embedded_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
