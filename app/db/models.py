@@ -1,14 +1,10 @@
 from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import BigInteger, Column, DateTime, String, Text
-
-from app.db.base import Base
-
-from sqlalchemy import Boolean, ForeignKey, Integer
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
-
+from app.db.base import Base
 
 class HeritageItem(Base):
     __tablename__ = "heritage_items"
