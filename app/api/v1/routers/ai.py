@@ -1,14 +1,19 @@
+import logging
+from collections.abc import Callable
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.api.v1.deps import get_db
+from app.core.config import settings
 from app.core.security import verify_internal_api_key
+from app.services.ai.fallback_service import FallbackService
 from app.services.ai.rag import CultureRagService, get_culture_rag_service
 
 router = APIRouter(dependencies=[Depends(verify_internal_api_key)])
+logger = logging.getLogger(__name__)
 
 
 class ExplainRequest(BaseModel):
@@ -30,10 +35,49 @@ class ExplainResponse(BaseModel):
     recommendedCategories: list[str]
 
 
+def get_culture_rag_service_factory() -> Callable[[], CultureRagService]:
+    return get_culture_rag_service
+
+
 @router.post("/explain", response_model=ExplainResponse)
 def explain_culture(
     payload: ExplainRequest,
     db: Session = Depends(get_db),
-    service: CultureRagService = Depends(get_culture_rag_service),
+    service_factory: Callable[[], CultureRagService] = Depends(get_culture_rag_service_factory),
 ) -> dict[str, Any]:
-    return service.explain(db, payload.query, payload.locale)
+    try:
+        service = service_factory()
+        return service.explain(db, payload.query, payload.locale)
+    except HTTPException as error:
+        if not _should_try_fallback(error):
+            raise
+
+        fallback = FallbackService().get_fallback_response(payload.query)
+        if fallback:
+            logger.warning(
+                "AI fallback response served",
+                extra={"query": payload.query, "status_code": error.status_code},
+            )
+            return fallback
+
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="AI service unavailable",
+        ) from error
+    except Exception as error:
+        logger.exception("AI explanation failed unexpectedly")
+        if settings.ai_fallback_enabled:
+            fallback = FallbackService().get_fallback_response(payload.query)
+            if fallback:
+                return fallback
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="AI service unavailable",
+        ) from error
+
+
+def _should_try_fallback(error: HTTPException) -> bool:
+    return settings.ai_fallback_enabled and error.status_code in {
+        status.HTTP_502_BAD_GATEWAY,
+        status.HTTP_503_SERVICE_UNAVAILABLE,
+    }

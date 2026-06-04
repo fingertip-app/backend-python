@@ -2,8 +2,11 @@ from app.db.base import Base
 from app.main import app
 
 
-def test_fastapi_owns_only_heritage_item_table():
-    assert set(Base.metadata.tables) == {"heritage_items"}
+def test_fastapi_ai_schema_tables_defined():
+    """FastAPI는 AI 기능용 3개 테이블을 소유한다"""
+    tables = {table.name for table in Base.metadata.tables.values()}
+    expected = {"heritage_items", "vector_documents", "embedding_metadata"}
+    assert tables == expected
 
 
 def test_spring_owned_external_routes_are_not_exposed():

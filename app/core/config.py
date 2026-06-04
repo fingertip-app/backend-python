@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     openai_generation_model: str = "gpt-4o-mini"
     rag_top_k: int = 5
     internal_api_key: str = ""
+    ai_fallback_enabled: bool = False
+    ai_fallback_data_path: str = "app/data/ai_fallback_responses.json"
 
 
 settings = Settings()

@@ -2,9 +2,9 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.api.v1 import deps
+from app.api.v1.routers.ai import get_culture_rag_service_factory
 from app.core.config import settings
 from app.main import app
-from app.services.ai.rag import get_culture_rag_service
 from tests.conftest import HealthyDb
 
 
@@ -26,7 +26,7 @@ def client():
 @pytest.fixture(autouse=True)
 def configured_internal_api_key(monkeypatch):
     monkeypatch.setattr(settings, "internal_api_key", "test-internal-key")
-    app.dependency_overrides[get_culture_rag_service] = lambda: StubCultureRagService()
+    app.dependency_overrides[get_culture_rag_service_factory] = lambda: lambda: StubCultureRagService()
     yield
     app.dependency_overrides.clear()
 
