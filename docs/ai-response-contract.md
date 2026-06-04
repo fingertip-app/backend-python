@@ -25,7 +25,7 @@ FastAPI endpoint directly.
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
 | `query` | string | yes | Non-empty user question. Empty strings are rejected with `422`. |
-| `locale` | string | no | Response locale. Defaults to `ko`. [TODO] Decide whether only `ko` is supported or `ko/en/ja` should be accepted. |
+| `locale` | string | no | Response locale. Defaults to `ko`. Current MVP scope is `ko`; `en/ja` support is a pending frontend decision. |
 
 ## Normal Response: 200 OK
 
@@ -90,6 +90,19 @@ Fallback is not used for `401`, `403`, `422`, or successful `200` no-result
 responses. If fallback is enabled but no matching fallback data exists, FastAPI
 returns `503`.
 
+## Fallback Policy
+
+| Situation | Use fallback | Reason |
+| --- | --- | --- |
+| Normal response | No | Use actual search/generation result. |
+| No search results | No | Normal `200` no-source response. |
+| `401` | No | Server-to-server authentication configuration issue. |
+| `403` | No | Server-to-server security configuration issue. |
+| `422` | No | Request validation failure. |
+| `502` | Possible | Protect demo flow during OpenAI provider failure. |
+| `503` | Possible | Protect demo flow during AI configuration/service failure. |
+| Timeout | Possible | Protect demo stability. |
+
 ## Error Responses
 
 FastAPI uses the default JSON error shape for non-`200` responses:
@@ -114,14 +127,25 @@ FastAPI uses the default JSON error shape for non-`200` responses:
 Structured AI error codes are not part of the current contract. Spring must not
 depend on parsing the free-form `detail` message beyond coarse status handling.
 
+## ⚠️ Spring Integration Notes
+
+- Spring `FastApiClient` must not parse the FastAPI error response `detail`
+  string.
+- Spring must distinguish these cases by HTTP status code only:
+  - `401` -> authentication configuration issue
+  - `403` -> security configuration issue
+  - `502` -> provider failure (retry candidate)
+  - `503` -> service unavailable (no retry)
+- FastAPI error messages may change without breaking Spring behavior.
+
 ## Field Specification
 
 | Field | Type | Required | Description | Sample |
 | --- | --- | --- | --- | --- |
 | `answer` | string | yes | User-facing explanation or no-result guidance. Must not be empty for successful responses. | `매듭은 전통 공예입니다.` |
 | `sources` | array of `Source` | yes | Source documents used for the answer. Empty array means no matching source was found. | See `Source` below. |
-| `matchingKeywords` | array of string | yes | Heritage item names or terms matched from source documents. Empty on search miss. [TODO] Decide whether this is capped at 1-3 items or remains variable. | `["매듭장"]` |
-| `recommendedCategories` | array of string | yes | Culture categories Spring can use to map experiences. Empty on search miss. [TODO] Decide whether this is capped at 1-2 items or remains variable. | `["공예"]` |
+| `matchingKeywords` | array of string | yes | Heritage item names or terms matched from source documents. Empty on search miss. Current count is variable; 1-3 item cap is pending decision. | `["매듭장"]` |
+| `recommendedCategories` | array of string | yes | Culture categories Spring can use to map experiences. Empty on search miss. Current count is variable; 1-2 item cap is pending decision. | `["공예"]` |
 
 ### Source
 
@@ -131,10 +155,3 @@ depend on parsing the free-form `detail` message beyond coarse status handling.
 | `name` | string | yes | Heritage item name. | `매듭장` |
 | `source` | string | yes | Source dataset or publisher name. | `국가유산포털` |
 | `category` | string or null | yes | Optional heritage category. | `공예` |
-
-## Open Decisions
-
-- [TODO] Decide `matchingKeywords` cardinality: 1-3 items or variable.
-- [TODO] Decide `recommendedCategories` cardinality: 1-2 items or variable.
-- [TODO] Decide locale support: `ko` only or `ko/en/ja`.
-- [TODO] Decide whether Spring implements a single retry for provider `502`.
