@@ -7,7 +7,7 @@
 ## MVP 완료 기준
 
 - 무형유산 데이터가 정제되어 pgvector에 저장되고, 질문별 관련 문서와 출처를 검색할 수 있다.
-- Spring 내부 요청에 대해 문화 해설, 출처, 매칭 키워드와 추천 카테고리를 반환한다.
+- Spring 내부 요청에 대해 AI 추천 탭과 카드뉴스 문화 설명에 필요한 안내 문구, 출처, 매칭 키워드와 추천 카테고리를 반환한다.
 - 후기 텍스트의 1차 요약과 핵심 영어 번역을 반환한다.
 - 응답 지연, OpenAI 오류, 검색 결과 없음에 대한 실패 정책과 테스트가 있다.
 
@@ -52,14 +52,15 @@
 
 완료 기준: 대표 데이터셋이 적재되고 질문에 대해 상위 문화 문서를 검색할 수 있다.
 
-### 6/8 - 6/14: RAG 해설과 관련 체험 반환
+### 6/8 - 6/14: RAG 기반 추천/문화 설명과 관련 체험 반환
 
-- [ ] [영진] 질문 임베딩 -> pgvector top-k 검색 -> GPT 문화 해설 흐름 구현
+- [ ] [영진] 취향/질문 입력 임베딩 -> pgvector top-k 검색 -> GPT 추천/문화 설명 흐름 구현
   - [ ] 검색 context 조립 방식 구현
-  - [ ] 출처 기반 답변 prompt 작성
+  - [ ] 출처 기반 안내/설명 prompt 작성
   - [ ] 모델 응답 schema validation 적용
 - [ ] [영진] 출처 정보가 포함된 `/api/v1/ai/explain` 실제 응답 구현
-  - [ ] explanation, sources, matched_keywords, recommended_categories 반환
+  - [ ] answer, sources, matchingKeywords, recommendedCategories 반환
+  - [ ] AI 추천 탭 입력값을 자연어 query/context로 변환하는 방식 정리
   - [ ] 검색 결과 없음 시 fallback 응답 반환
   - [ ] Spring client와 timeout 기준 재확인
 - [ ] [서영] 체험 연결용 유사도 검색 데이터/쿼리 구현
@@ -75,7 +76,7 @@
   - [ ] vector search empty result
   - [ ] Spring timeout/fallback
 
-완료 기준: Spring 경유 질문에서 실제 해설, 출처, 매칭 키워드와 추천 카테고리가 반환된다.
+완료 기준: Spring 경유 AI 추천 탭/카드뉴스 요청에서 실제 안내 문구, 출처, 매칭 키워드와 추천 카테고리가 반환된다.
 
 ### 6/15 - 6/21: 후기 요약과 번역 최소 기능
 
@@ -108,8 +109,9 @@
   - [ ] explain/review/translate API 응답 시간 측정
   - [ ] timeout, retry, fallback 로그 확인
   - [ ] Spring 장애 대응 문서와 맞춰 최종 점검
-- [ ] [공통] 카드뉴스 -> 해설 -> 추천 체험 통합 시나리오 검증
+- [ ] [공통] AI 추천 탭/카드뉴스 -> 문화 설명 -> 추천 체험 통합 시나리오 검증
   - [ ] 카드뉴스 id 기반 질문 흐름 확인
+  - [ ] 취향 입력 기반 추천 흐름 확인
   - [ ] 해설 하단 추천 카테고리/체험 연결 확인
   - [ ] 실제 기기 또는 프론트 앱에서 E2E 확인
 - [ ] [공통] 시연 중 외부 모델 장애에 대비한 고정 데모 fallback 준비
