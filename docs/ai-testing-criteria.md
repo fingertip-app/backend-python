@@ -42,15 +42,15 @@ The expected reference test class is `FastApiClientTest.java`.
 
 | # | Case | Expected result | 현황 |
 | ---: | --- | --- | --- |
-| 1 | Normal FastAPI `200` response | Maps `answer`, `sources`, `matchingKeywords`, `recommendedCategories` into Spring response model | ⏳ Spring 담당 |
+| 1 | Normal FastAPI `200` response | Maps `answer`, `sources`, `matchingKeywords`, `recommendedCategories` into Spring response model | ✅ `FastApiClientTest::sendsInternalKeyAndParsesExplainResponse` |
 | 2 | Search miss: FastAPI `200` with `sources=[]` | Returns no-result state without treating it as an error | ⏳ Spring 담당 |
 | 3 | FastAPI `401` | Maps to authentication/configuration failure; no retry | ⏳ Spring 담당 |
-| 4 | FastAPI `403` | Maps to security/configuration failure; no retry | ⏳ Spring 담당 |
-| 5 | FastAPI `503` configuration error | Maps to AI configuration or unavailable state according to Spring error model | ⏳ Spring 담당 |
-| 6 | FastAPI provider `502`, retry success | Retries once and returns successful mapped response if retry policy is enabled | ⏳ Spring 담당 |
-| 7 | FastAPI provider `502`, retry failure | Returns AI unavailable after retry is exhausted if retry policy is enabled | ⏳ Spring 담당 |
+| 4 | FastAPI `403` | Maps to security/configuration failure; no retry | ✅ `FastApiClientTest::mapsAuthenticationFailureToConfigurationError` |
+| 5 | FastAPI `503` configuration error | Maps to AI unavailable without retry | ✅ `FastApiClientTest::mapsServiceUnavailableToUnavailableErrorWithoutRetry` |
+| 6 | FastAPI provider `502`, retry success | Retries once and returns successful mapped response | ✅ `FastApiClientTest::retriesBadGatewayOnceAndReturnsSuccessfulResponse` |
+| 7 | FastAPI provider `502`, retry failure | Returns AI unavailable after retry is exhausted | ✅ `FastApiClientTest::retriesBadGatewayOnceAndMapsFailureToUnavailableError` |
 | 8 | Connect timeout | Returns AI timeout response to app layer | ⏳ Spring 담당 |
-| 9 | Read timeout | Returns AI timeout response to app layer | ⏳ Spring 담당 |
+| 9 | Read/socket timeout | Returns AI timeout response to app layer | ✅ `FastApiClientTest::mapsSocketTimeoutToTimeoutError` |
 
 ## Frontend Test Criteria
 
@@ -73,5 +73,5 @@ Spring, not the internal FastAPI endpoint directly.
 | `matchingKeywords` 개수 | 가변 | 1~3개 제한 여부 | 영진/Frontend | 2026-06-07 |
 | `recommendedCategories` 개수 | 가변 | 1~2개 제한 여부 | 영진/Frontend | 2026-06-07 |
 | locale 범위 | `ko` | `en/ja` MVP 포함 여부 | 영진/Frontend | 2026-06-07 |
-| Spring 재시도 정책 | 자동 재시도 없음 | 502 재시도 여부 | 영진/Spring | 2026-06-10 |
+| Spring 재시도 정책 | 502만 1회 재시도 | 503은 재시도하지 않음 | 영진/Spring | 결정됨 |
 | Frontend fallback 표시 | 일반 응답과 동일 | 별도 배지 표시 여부 | Frontend | 2026-06-10 |
