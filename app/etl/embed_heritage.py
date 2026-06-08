@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from openai import OpenAI
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.db.models import EmbeddingMetadata, EmbeddingStatus, HeritageItem, VectorDocument
 from app.db.session import SessionLocal
 
@@ -137,7 +138,7 @@ def process_item(client: OpenAI, db: Session, item: HeritageItem) -> None:
 
 
 def run(retry_failed: bool = False) -> None:
-    client = OpenAI()
+    client = OpenAI(api_key=settings.openai_api_key)
     db = SessionLocal()
 
     try:
