@@ -28,19 +28,19 @@
 
 ### 6/1 - 6/7: ETL과 벡터 검색 기반
 
-- [ ] [서영] pgvector 마이그레이션과 검색 인덱스 적용
-  - [ ] `heritage_items`, `vector_documents` 테이블 생성/검증
-  - [ ] embedding 컬럼 차원과 ivfflat/hnsw 인덱스 방식 확정
-  - [ ] 로컬/배포 DB 재실행 가능한 migration 흐름 확인
-- [ ] [서영] 공공데이터 수집/정제/중복 제거 ETL 구현
-  - [ ] 국가무형유산 종목 설명 데이터 수집
+- [x] [서영] pgvector 마이그레이션과 검색 인덱스 적용
+  - [x] `heritage_items`, `vector_documents` 테이블 생성/검증
+  - [x] embedding 컬럼 차원과 ivfflat/hnsw 인덱스 방식 확정
+  - [x] 로컬/배포 DB 재실행 가능한 migration 흐름 확인git status
+- [x] [서영] 공공데이터 수집/정제/중복 제거 ETL 구현
+  - [x] 국가무형유산 종목 설명 데이터 수집
   - [ ] 보유자/전승자 기본 정보 수집
-  - [ ] 동일 종목/동일 문서 중복 제거 기준 적용
-  - [ ] [결정필요] MVP 적재 범위가 부족하면 수작업 데모 데이터 보강 여부 결정
+  - [x] 동일 종목/동일 문서 중복 제거 기준 적용
+  - [x] [결정필요] MVP 적재 범위가 부족하면 수작업 데모 데이터 보강 여부 결정(구술 자서전 34건 추가)
 - [ ] [서영] 임베딩 생성 배치와 재실행 가능한 적재 흐름 구현
-  - [ ] 문서 chunking 기준 정의
+  - [x] 문서 chunking 기준 정의
   - [ ] embedding metadata에 source/title/category 저장
-  - [ ] 실패한 문서만 재처리할 수 있는 batch 옵션 추가
+  - [x] 실패한 문서만 재처리할 수 있는 batch 옵션 추가
 - [ ] [영진] 설정/로그/내부 인증/health check 정리
   - [ ] OpenAI, DB, Spring internal auth 환경변수 검증
   - [ ] `/health`에서 DB 연결과 AI 설정 상태 분리 표시
