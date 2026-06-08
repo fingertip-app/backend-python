@@ -31,7 +31,7 @@
 - [x] [서영] pgvector 마이그레이션과 검색 인덱스 적용
   - [x] `heritage_items`, `vector_documents` 테이블 생성/검증
   - [x] embedding 컬럼 차원과 ivfflat/hnsw 인덱스 방식 확정
-  - [x] 로컬/배포 DB 재실행 가능한 migration 흐름 확인
+  - [x] 로컬/배포 DB 재실행 가능한 migration 흐름 확인git status
 - [x] [서영] 공공데이터 수집/정제/중복 제거 ETL 구현
   - [x] 국가무형유산 종목 설명 데이터 수집
   - [ ] 보유자/전승자 기본 정보 수집
