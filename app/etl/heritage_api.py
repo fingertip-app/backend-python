@@ -7,7 +7,7 @@ import httpx
 BASE_URL = "http://www.khs.go.kr/cha"
 INTANGIBLE_KIND_CODE = "17"
 REGION_CODE = "ZZ"
-
+RETRY_BACKOFF_BASE = 2  # 재시도 간격 기본값 (초), 지수 백오프: base * attempt
 
 @dataclass
 class HeritageItemRaw:
@@ -83,7 +83,7 @@ def fetch_detail(ccba_kdcd: str, ccba_asno: str, ccba_ctcd: str, retries: int = 
             )
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             print(f"  재시도 {attempt}/{retries}: {e}")
-            time.sleep(2 * attempt)
+            time.sleep(RETRY_BACKOFF_BASE * attempt)
 
     return None
 
