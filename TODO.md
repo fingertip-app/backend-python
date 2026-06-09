@@ -66,7 +66,8 @@
 - [ ] [서영] 체험 연결용 유사도 검색 데이터/쿼리 구현
   - [ ] 문화유산 category와 체험 category 매핑 초안 작성
   - [ ] 추천 카테고리 후보와 매칭 키워드 산출 기준 정리
-  - [ ] [결정필요] Spring `Experience.category` 추가 여부에 맞춰 반환 필드 조정
+  - [x] Spring `Experience.category` 단일 필드가 아니라 태그 기반 매칭으로 결정
+  - [ ] Spring 태그 매칭 기준에 맞춰 `recommendedCategories`/`matchingKeywords` 산출 기준 조정
 - [ ] [영진] Spring 내부 호출 연동을 지원하고 mock 응답을 제거
   - [ ] 기존 mock response 제거
   - [ ] 실제 DB/vector 검색 기반 응답으로 교체
