@@ -15,6 +15,7 @@ dependencies = [
   "openai>=1.40.0",
   "langchain>=0.2.0",
   "pgvector>=0.3.0",
+  "pdfplumber>=0.11.0"
 ]
 
 [project.optional-dependencies]
@@ -24,4 +25,3 @@ dev = ["pytest>=8.0.0", "httpx>=0.27.0", "ruff>=0.6.0"]
 line-length = 100
 target-version = "py311"
 
-pdfplumber

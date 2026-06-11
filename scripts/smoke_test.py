@@ -30,7 +30,15 @@ def search(query: str, top_k: int = 5, category: str = None):
         params["category"] = category
 
     rows = db.execute(sql, params).fetchall()
-    for r in rows:
+    
+    THRESHOLD = 0.30
+    filtered = [r for r in rows if r.similarity >= THRESHOLD]
+    
+    if not filtered:
+        print("  결과 없음 (임계값 0.30 미만)\n")
+        return
+        
+    for r in filtered:
         print(f"[{r.similarity:.3f}] {r.title} ({r.category})\n  {r.snippet}\n")
 
 # 테스트 케이스
