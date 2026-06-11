@@ -37,9 +37,9 @@
   - [ ] 보유자/전승자 기본 정보 수집
   - [x] 동일 종목/동일 문서 중복 제거 기준 적용
   - [x] [결정필요] MVP 적재 범위가 부족하면 수작업 데모 데이터 보강 여부 결정(구술 자서전 34건 추가)
-- [ ] [서영] 임베딩 생성 배치와 재실행 가능한 적재 흐름 구현
+- [x] [서영] 임베딩 생성 배치와 재실행 가능한 적재 흐름 구현
   - [x] 문서 chunking 기준 정의
-  - [ ] embedding metadata에 source/title/category 저장
+  - [x] embedding metadata에 source/title/category 저장
   - [x] 실패한 문서만 재처리할 수 있는 batch 옵션 추가
 - [ ] [영진] 설정/로그/내부 인증/health check 정리
   - [ ] OpenAI, DB, Spring internal auth 환경변수 검증
@@ -64,7 +64,7 @@
   - [ ] 검색 결과 없음 시 fallback 응답 반환
   - [ ] Spring client와 timeout 기준 재확인
 - [ ] [서영] 체험 연결용 유사도 검색 데이터/쿼리 구현
-  - [ ] 문화유산 category와 체험 category 매핑 초안 작성
+  - [x] 문화유산 category와 체험 category 매핑 초안 작성
   - [ ] 추천 카테고리 후보와 매칭 키워드 산출 기준 정리
   - [x] Spring `Experience.category` 단일 필드가 아니라 태그 기반 매칭으로 결정
   - [ ] Spring 태그 매칭 기준에 맞춰 `recommendedCategories`/`matchingKeywords` 산출 기준 조정

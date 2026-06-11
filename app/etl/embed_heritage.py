@@ -123,6 +123,9 @@ def process_item(client: OpenAI, db: Session, item: HeritageItem) -> None:
                 chunk_index=idx,
                 content=chunk,
                 embedding=embedding,
+                source=item.source,
+                title=item.name,
+                category=item.category,
             ))
             time.sleep(DELAY)
 

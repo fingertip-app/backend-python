@@ -46,6 +46,10 @@ class VectorDocument(Base):
     __table_args__ = (
         Index('ix_vector_documents_heritage_item_id', 'heritage_item_id'),
     )
+    
+    source = Column(String(100), nullable=True)
+    title = Column(String(255), nullable=True)
+    category = Column(String(100), nullable=True)
 
 
 class EmbeddingMetadata(Base):
