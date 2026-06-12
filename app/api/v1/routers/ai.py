@@ -11,6 +11,7 @@ from app.core.config import settings
 from app.core.security import verify_internal_api_key
 from app.services.ai.fallback_service import FallbackService
 from app.services.ai.rag import CultureRagService, get_culture_rag_service
+from app.services.ai.review_summary import ReviewSummaryService
 
 router = APIRouter(dependencies=[Depends(verify_internal_api_key)])
 logger = logging.getLogger(__name__)
@@ -19,6 +20,17 @@ logger = logging.getLogger(__name__)
 class ExplainRequest(BaseModel):
     query: str = Field(min_length=1)
     locale: str = "ko"
+
+
+class ReviewSummaryRequest(BaseModel):
+    content: str = Field(min_length=1)
+    locale: str = "ko"
+
+
+class ReviewSummaryResponse(BaseModel):
+    summary: str
+    sentimentScore: float
+    keywords: list[str]
 
 
 class SourceResponse(BaseModel):
@@ -81,3 +93,16 @@ def _should_try_fallback(error: HTTPException) -> bool:
         status.HTTP_502_BAD_GATEWAY,
         status.HTTP_503_SERVICE_UNAVAILABLE,
     }
+
+
+@router.post("/review-summary", response_model=ReviewSummaryResponse)
+def review_summary(payload: ReviewSummaryRequest) -> dict[str, Any]:
+    try:
+        service = ReviewSummaryService()
+        return service.summarize(payload.content, payload.locale)
+    except Exception as error:
+        logger.exception("Review summary failed unexpectedly")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="AI service unavailable",
+        ) from error
