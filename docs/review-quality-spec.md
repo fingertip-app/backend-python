@@ -3,6 +3,7 @@
 > 작성일: 2026-06-16
 > 작성자: 김서영
 > 목적: AI 후기 요약 API 테스트용 샘플 및 응답 구조 정의
+> 기준: 영진 구현 (`ReviewSummaryService`) 기준으로 정렬
 
 ---
 
@@ -11,22 +12,16 @@
 ```json
 {
   "summary": "string",
-  "sentiment_keywords": {
-    "positive": ["string"],
-    "negative": ["string"]
-  },
-  "highlights": ["string"],
-  "sentiment": "positive" | "neutral" | "negative"
+  "sentimentScore": 0.0,
+  "keywords": ["string"]
 }
 ```
 
 | 필드 | 타입 | 설명 |
 |---|---|---|
-| `summary` | string | 전체 후기를 2~3문장으로 요약 |
-| `sentiment_keywords.positive` | string[] | 긍정 키워드 최대 5개 |
-| `sentiment_keywords.negative` | string[] | 부정 키워드 최대 5개 |
-| `highlights` | string[] | 자주 언급된 특징 최대 3개 |
-| `sentiment` | enum | 전체 감성 분류 |
+| `summary` | string | 전체 후기를 2~3문장으로 요약. 10자 미만이면 원문 그대로 반환 |
+| `sentimentScore` | float | 감성 점수 0.0(부정) ~ 1.0(긍정). 짧은 리뷰 fallback 시 0.5 고정 |
+| `keywords` | string[] | 핵심 키워드 최대 5개. 빈 문자열 제거 후 반환 |
 
 ---
 
@@ -123,12 +118,8 @@
 ```json
 {
   "summary": "친절한 설명과 함께 흙을 직접 만지며 그릇을 만드는 힐링 체험으로, 외국인도 즐길 수 있는 영어 안내가 인상적이었습니다. 완성 작품을 수령할 수 있어 만족도가 높은 체험입니다.",
-  "sentiment_keywords": {
-    "positive": ["친절한 설명", "힐링", "재미있음", "영어 안내", "작품 수령"],
-    "negative": []
-  },
-  "highlights": ["친절한 강사", "외국인 동반 가능", "작품 제작 후 수령"],
-  "sentiment": "positive"
+  "sentimentScore": 0.9,
+  "keywords": ["친절한 설명", "힐링", "영어 안내", "작품 수령", "재미있음"]
 }
 ```
 
@@ -136,12 +127,8 @@
 ```json
 {
   "summary": "친절한 강사와 기본적인 탈춤 동작을 배울 수 있었으나, 체험 시간이 짧아 아쉬움이 남는다는 의견이 있습니다.",
-  "sentiment_keywords": {
-    "positive": ["친절한 선생님", "탈 설명"],
-    "negative": ["짧은 시간", "가격 대비 아쉬움"]
-  },
-  "highlights": ["기본 동작 학습", "짧은 체험 시간"],
-  "sentiment": "neutral"
+  "sentimentScore": 0.5,
+  "keywords": ["친절한 선생님", "탈 설명", "짧은 시간", "가격 대비 아쉬움"]
 }
 ```
 
@@ -149,12 +136,8 @@
 ```json
 {
   "summary": "장인 대신 다른 진행자가 체험을 운영해 기대에 미치지 못했으며, 설명 부족과 준비 미흡으로 실망스러웠다는 평가입니다.",
-  "sentiment_keywords": {
-    "positive": [],
-    "negative": ["장인 부재", "설명 부족", "준비 미흡", "비싼 가격", "재방문 의사 없음"]
-  },
-  "highlights": ["장인 부재", "준비 미흡"],
-  "sentiment": "negative"
+  "sentimentScore": 0.1,
+  "keywords": ["장인 부재", "설명 부족", "준비 미흡", "비싼 가격"]
 }
 ```
 
@@ -164,7 +147,7 @@
 
 | 케이스 | 처리 방식 |
 |---|---|
-| 빈 리뷰 (`""`) | `summary: ""`, `sentiment: "neutral"`, 나머지 빈 배열 반환 |
-| 10자 미만 짧은 리뷰 | 원문 그대로 `summary`에 반환, 키워드 추출 생략 |
+| 빈 리뷰 (`""`) | `summary: ""`, `sentimentScore: 0.5`, `keywords: []` 반환 |
+| 10자 미만 짧은 리뷰 | 원문 그대로 `summary`에 반환, `sentimentScore: 0.5`, `keywords: []` |
 | 개인정보 포함 (전화번호·이메일) | 마스킹 후 처리 또는 해당 문장 제외 |
-| OpenAI 호출 실패 | `{"error": "요약 서비스를 일시적으로 사용할 수 없습니다."}` 반환 |
+| OpenAI 호출 실패 | 503 반환, `detail: "AI service unavailable"` |
