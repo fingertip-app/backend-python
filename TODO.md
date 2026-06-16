@@ -86,13 +86,9 @@
   - [ ] summary, sentiment_keywords, highlights 응답 구조 정의
   - [ ] 부정/중립/긍정 샘플별 기대 결과 작성
 - [ ] [영진] 후기 요약 내부 API 구현
-  - [x] Spring에서 전달한 review 요약 요청 처리
-  - [x] 빈 리뷰/짧은 리뷰 fallback 처리
-  - [x] 요약 결과 score clamp, keyword 정규화 적용
-  - [x] OpenAI client lazy init으로 짧은 리뷰 fallback 시 API key 없이 처리
-  - [x] route/service 단위 테스트 추가
-  - [ ] review batch 요약이 필요하면 별도 batch endpoint로 분리
-  - [ ] 요약 결과 schema validation 고도화
+  - [ ] Spring에서 전달한 review batch 요약
+  - [ ] 빈 리뷰/짧은 리뷰 fallback 처리
+  - [ ] 요약 결과 schema validation 적용
 - [ ] [영진] 핵심 AI 해설 영어 번역 API 또는 locale 응답 구현
   - [ ] [결정필요] 별도 번역 API와 `/explain?locale=en` 중 구현 방식 확정
   - [ ] 영어 번역 결과와 원문 출처 연결 유지
