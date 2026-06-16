@@ -45,10 +45,10 @@
   - [ ] OpenAI, DB, Spring internal auth 환경변수 검증
   - [ ] `/health`에서 DB 연결과 AI 설정 상태 분리 표시
   - [ ] 모델 호출 request id/logging 정리
-- [ ] [공통] ETL 및 검색 smoke test 작성
-  - [ ] 대표 키워드로 top-k 검색 결과 확인
-  - [ ] 검색 결과 없음 케이스 확인
-  - [ ] CI 또는 로컬 smoke command 문서화
+- [x] [서영] ETL 및 검색 smoke test 작성
+  - [x] [서영] 대표 키워드로 top-k 검색 결과 확인
+  - [x] [서영] 검색 결과 없음 케이스 확인
+  - [x] [서영] CI 또는 로컬 smoke command 문서화
 
 완료 기준: 대표 데이터셋이 적재되고 질문에 대해 상위 문화 문서를 검색할 수 있다.
 
@@ -81,18 +81,14 @@
 
 ### 6/15 - 6/21: 후기 요약과 번역 최소 기능
 
-- [ ] [서영] 후기 요약/감성 키워드 결과 스키마와 품질 샘플 마련
-  - [ ] 리뷰 원문 샘플 수집
-  - [ ] summary, sentiment_keywords, highlights 응답 구조 정의
-  - [ ] 부정/중립/긍정 샘플별 기대 결과 작성
+- [x] [서영] 후기 요약/감성 키워드 결과 스키마와 품질 샘플 마련
+  - [x] 리뷰 원문 샘플 수집
+  - [x] summary, sentiment_keywords, highlights 응답 구조 정의
+  - [x] 부정/중립/긍정 샘플별 기대 결과 작성
 - [ ] [영진] 후기 요약 내부 API 구현
-  - [x] Spring에서 전달한 review 요약 요청 처리
-  - [x] 빈 리뷰/짧은 리뷰 fallback 처리
-  - [x] 요약 결과 score clamp, keyword 정규화 적용
-  - [x] OpenAI client lazy init으로 짧은 리뷰 fallback 시 API key 없이 처리
-  - [x] route/service 단위 테스트 추가
-  - [ ] review batch 요약이 필요하면 별도 batch endpoint로 분리
-  - [ ] 요약 결과 schema validation 고도화
+  - [ ] Spring에서 전달한 review batch 요약
+  - [ ] 빈 리뷰/짧은 리뷰 fallback 처리
+  - [ ] 요약 결과 schema validation 적용
 - [ ] [영진] 핵심 AI 해설 영어 번역 API 또는 locale 응답 구현
   - [ ] [결정필요] 별도 번역 API와 `/explain?locale=en` 중 구현 방식 확정
   - [ ] 영어 번역 결과와 원문 출처 연결 유지
