@@ -1,0 +1,13 @@
+{
+  "answer": "외부 AI 호출이 불안정할 때 사용하는 시연용 fallback 응답입니다. 판소리의 기본 설명과 추천 카테고리를 제공합니다.",
+  "sources": [
+    {
+      "id": 9001,
+      "name": "판소리",
+      "source": "demo-fallback",
+      "category": "음악"
+    }
+  ],
+  "matchingKeywords": ["판소리"],
+  "recommendedCategories": ["음악", "공연"]
+}

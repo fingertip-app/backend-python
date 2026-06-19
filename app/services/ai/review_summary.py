@@ -5,6 +5,7 @@ from typing import Any
 from openai import OpenAI
 
 from app.core.config import settings
+from app.services.ai.privacy import mask_personal_data
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ class ReviewSummaryService:
         self.client = client
 
     def summarize(self, content: str, locale: str) -> dict[str, Any]:
-        normalized_content = content.strip()
+        normalized_content = mask_personal_data(content.strip())
         if len(normalized_content) < MIN_SUMMARY_CONTENT_LENGTH:
             return self._short_review_response(normalized_content, locale)
 

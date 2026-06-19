@@ -1,0 +1,13 @@
+{
+  "answer": "판소리는 소리꾼과 고수가 긴 서사를 음악적으로 풀어내는 전통 공연예술입니다.",
+  "sources": [
+    {
+      "id": 1,
+      "name": "판소리",
+      "source": "국가유산포털",
+      "category": "음악"
+    }
+  ],
+  "matchingKeywords": ["판소리", "소리꾼", "고수"],
+  "recommendedCategories": ["음악", "공연"]
+}

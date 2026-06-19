@@ -59,6 +59,31 @@ def test_review_summary_normalizes_model_response(monkeypatch):
     assert service.client.chat.completions.call["model"] == "generation-model"
 
 
+def test_review_summary_masks_personal_data_before_model_call():
+    service = ReviewSummaryService(
+        FakeClient('{"summary": "연락처는 제외하고 요약", "sentimentScore": 0.7, "keywords": ["친절"]}')
+    )
+
+    service.summarize("담당자가 john@example.com 와 010-1234-5678로 친절히 안내했습니다.", "ko")
+
+    user_message = service.client.chat.completions.call["messages"][1]["content"]
+    assert "john@example.com" not in user_message
+    assert "010-1234-5678" not in user_message
+    assert "[email]" in user_message
+    assert "[phone]" in user_message
+
+
+def test_review_summary_english_locale_prompt():
+    service = ReviewSummaryService(
+        FakeClient('{"summary": "A satisfying craft class.", "sentimentScore": 0.9, "keywords": ["craft"]}')
+    )
+
+    service.summarize("The instructor was kind and the craft class was memorable.", "en")
+
+    system_message = service.client.chat.completions.call["messages"][0]["content"]
+    assert "in English" in system_message
+
+
 def test_review_summary_short_review_does_not_call_model():
     service = ReviewSummaryService(FakeClient('{"summary": "should not be used"}'))
 

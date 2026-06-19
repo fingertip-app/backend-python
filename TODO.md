@@ -41,50 +41,50 @@
   - [x] 문서 chunking 기준 정의
   - [x] embedding metadata에 source/title/category 저장
   - [x] 실패한 문서만 재처리할 수 있는 batch 옵션 추가
-- [ ] [영진] 설정/로그/내부 인증/health check 정리
-  - [ ] OpenAI, DB, Spring internal auth 환경변수 검증
-  - [ ] `/health`에서 DB 연결과 AI 설정 상태 분리 표시
-  - [ ] 모델 호출 request id/logging 정리
-- [ ] [공통] ETL 및 검색 smoke test 작성
-  - [ ] 대표 키워드로 top-k 검색 결과 확인
-  - [ ] 검색 결과 없음 케이스 확인
-  - [ ] CI 또는 로컬 smoke command 문서화
+- [x] [영진] 설정/로그/내부 인증/health check 정리
+  - [x] OpenAI, DB, Spring internal auth 환경변수 검증
+  - [x] `/health`에서 DB 연결과 AI 설정 상태 분리 표시
+  - [x] 모델 호출 request id/logging 정리
+- [x] [공통] ETL 및 검색 smoke test 작성
+  - [x] 대표 키워드로 top-k 검색 결과 확인
+  - [x] 검색 결과 없음 케이스 확인
+  - [x] CI 또는 로컬 smoke command 문서화
 
 완료 기준: 대표 데이터셋이 적재되고 질문에 대해 상위 문화 문서를 검색할 수 있다.
 
 ### 6/8 - 6/14: RAG 기반 추천/문화 설명과 관련 체험 반환
 
-- [ ] [영진] 취향/질문 입력 임베딩 -> pgvector top-k 검색 -> GPT 추천/문화 설명 흐름 구현
-  - [ ] 검색 context 조립 방식 구현
-  - [ ] 출처 기반 안내/설명 prompt 작성
-  - [ ] 모델 응답 schema validation 적용
-- [ ] [영진] 출처 정보가 포함된 `/api/v1/ai/explain` 실제 응답 구현
-  - [ ] answer, sources, matchingKeywords, recommendedCategories 반환
-  - [ ] AI 추천 탭 입력값을 자연어 query/context로 변환하는 방식 정리
-  - [ ] 검색 결과 없음 시 fallback 응답 반환
-  - [ ] Spring client와 timeout 기준 재확인
+- [x] [영진] 취향/질문 입력 임베딩 -> pgvector top-k 검색 -> GPT 추천/문화 설명 흐름 구현
+  - [x] 검색 context 조립 방식 구현
+  - [x] 출처 기반 안내/설명 prompt 작성
+  - [x] 모델 응답 schema validation 적용
+- [x] [영진] 출처 정보가 포함된 `/api/v1/ai/explain` 실제 응답 구현
+  - [x] answer, sources, matchingKeywords, recommendedCategories 반환
+  - [x] AI 추천 탭 입력값을 자연어 query/context로 변환하는 방식 정리
+  - [x] 검색 결과 없음 시 fallback 응답 반환
+  - [x] Spring client와 timeout 기준 재확인
 - [ ] [서영] 체험 연결용 유사도 검색 데이터/쿼리 구현
   - [x] 문화유산 category와 체험 category 매핑 초안 작성
-  - [ ] 추천 카테고리 후보와 매칭 키워드 산출 기준 정리
+  - [x] 추천 카테고리 후보와 매칭 키워드 산출 기준 정리
   - [x] Spring `Experience.category` 단일 필드가 아니라 태그 기반 매칭으로 결정
-  - [ ] Spring 태그 매칭 기준에 맞춰 `recommendedCategories`/`matchingKeywords` 산출 기준 조정
-- [ ] [영진] Spring 내부 호출 연동을 지원하고 mock 응답을 제거
-  - [ ] 기존 mock response 제거
-  - [ ] 실제 DB/vector 검색 기반 응답으로 교체
-  - [ ] Spring 통합 테스트용 fixture 제공
-- [ ] [공통] 출처 없음, 모델 실패, timeout 테스트 추가
-  - [ ] OpenAI failure
-  - [ ] vector search empty result
-  - [ ] Spring timeout/fallback
+  - [x] Spring 태그 매칭 기준에 맞춰 `recommendedCategories`/`matchingKeywords` 산출 기준 조정
+- [x] [영진] Spring 내부 호출 연동을 지원하고 mock 응답을 제거
+  - [x] 기존 mock response 제거
+  - [x] 실제 DB/vector 검색 기반 응답으로 교체
+  - [x] Spring 통합 테스트용 fixture 제공
+- [x] [공통] 출처 없음, 모델 실패, timeout 테스트 추가
+  - [x] OpenAI failure
+  - [x] vector search empty result
+  - [x] Spring timeout/fallback
 
 완료 기준: Spring 경유 AI 추천 탭/카드뉴스 요청에서 실제 안내 문구, 출처, 매칭 키워드와 추천 카테고리가 반환된다.
 
 ### 6/15 - 6/21: 후기 요약과 번역 최소 기능
 
-- [ ] [서영] 후기 요약/감성 키워드 결과 스키마와 품질 샘플 마련
-  - [ ] 리뷰 원문 샘플 수집
-  - [ ] summary, sentiment_keywords, highlights 응답 구조 정의
-  - [ ] 부정/중립/긍정 샘플별 기대 결과 작성
+- [x] [서영] 후기 요약/감성 키워드 결과 스키마와 품질 샘플 마련
+  - [x] 리뷰 원문 샘플 수집
+  - [x] summary, sentimentScore, keywords 응답 구조 정의
+  - [x] 부정/중립/긍정 샘플별 기대 결과 작성
 - [ ] [영진] 후기 요약 내부 API 구현
   - [x] Spring에서 전달한 review 요약 요청 처리
   - [x] 빈 리뷰/짧은 리뷰 fallback 처리
@@ -94,12 +94,12 @@
   - [ ] review batch 요약이 필요하면 별도 batch endpoint로 분리
   - [ ] 요약 결과 schema validation 고도화
 - [ ] [영진] 핵심 AI 해설 영어 번역 API 또는 locale 응답 구현
-  - [ ] [결정필요] 별도 번역 API와 `/explain?locale=en` 중 구현 방식 확정
-  - [ ] 영어 번역 결과와 원문 출처 연결 유지
+  - [x] [결정필요] 별도 번역 API와 `/explain?locale=en` 중 구현 방식 확정
+  - [x] 영어 번역 결과와 원문 출처 연결 유지
   - [ ] 번역 실패 시 한국어 원문 fallback
 - [ ] [공통] 개인정보성 입력 필터와 모델 호출 실패 처리 점검
-  - [ ] 전화번호/이메일 등 개인정보성 입력 처리 기준 정리
-  - [ ] 모델 실패 시 Spring 저장 정책 확인
+  - [x] 전화번호/이메일 등 개인정보성 입력 처리 기준 정리
+  - [x] 모델 실패 시 Spring 저장 정책 확인
   - [ ] 후기 요약/번역 통합 테스트 작성
 
 완료 기준: 후기 샘플 요약과 영어 해설 결과가 Spring을 통해 조회된다.
@@ -107,7 +107,7 @@
 ### 6/22 - 6/28: 성능 점검과 시연 데이터 고정
 
 - [ ] [서영] 데모용 데이터 적재본, 재적재 절차, 검색 결과 품질 점검
-  - [ ] 시연 질문별 기대 검색 결과 고정
+  - [x] 시연 질문별 기대 검색 결과 고정
   - [ ] 재적재 command와 소요 시간 기록
   - [ ] 출처 누락/부정확 응답 샘플 수정
 - [ ] [영진] 응답 시간/timeout/fallback 정책과 운영 로그 점검
@@ -119,10 +119,10 @@
   - [ ] 취향 입력 기반 추천 흐름 확인
   - [ ] 해설 하단 추천 카테고리/체험 연결 확인
   - [ ] 실제 기기 또는 프론트 앱에서 E2E 확인
-- [ ] [공통] 시연 중 외부 모델 장애에 대비한 고정 데모 fallback 준비
-  - [ ] 대표 질문 fallback 응답 고정
-  - [ ] 외부 모델 차단 상태에서 시연 경로 검증
-  - [ ] 시연 직전 데이터/환경변수 freeze
+- [x] [공통] 시연 중 외부 모델 장애에 대비한 고정 데모 fallback 준비
+  - [x] 대표 질문 fallback 응답 고정
+  - [x] 외부 모델 차단 상태에서 시연 경로 검증
+  - [x] 시연 직전 데이터/환경변수 freeze
 
 완료 기준: 대표 질문 시나리오가 안정적으로 응답하고 6/28 시연 데이터가 고정된다.
 

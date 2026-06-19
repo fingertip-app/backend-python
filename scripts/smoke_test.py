@@ -1,15 +1,19 @@
-# smoke_test.py 임시 스크립트
 import os
+
 from openai import OpenAI
 from sqlalchemy import text
+
+from app.core.config import settings
 from app.db.session import SessionLocal
 
-client = OpenAI()
-db = SessionLocal()
+SIMILARITY_THRESHOLD = float(os.getenv("SMOKE_SIMILARITY_THRESHOLD", "0.30"))
+DEFAULT_QUERIES = ("도자기 만들기 체험", "판소리 배우기", "우주여행 로켓 발사")
 
-def search(query: str, top_k: int = 5, category: str = None):
+
+def search(query: str, top_k: int = 5, category: str | None = None) -> list[dict[str, object]]:
+    client = OpenAI(api_key=settings.openai_api_key or None)
     embedding = client.embeddings.create(
-        model="text-embedding-3-small",
+        model=os.getenv("OPENAI_EMBEDDING_MODEL", settings.openai_embedding_model),
         input=query,
     ).data[0].embedding
 
@@ -29,23 +33,39 @@ def search(query: str, top_k: int = 5, category: str = None):
     if category:
         params["category"] = category
 
-    rows = db.execute(sql, params).fetchall()
-    
-    THRESHOLD = 0.30
-    filtered = [r for r in rows if r.similarity >= THRESHOLD]
-    
-    if not filtered:
-        print("  결과 없음 (임계값 0.30 미만)\n")
+    with SessionLocal() as db:
+        rows = db.execute(sql, params).fetchall()
+
+    filtered = [r for r in rows if r.similarity >= SIMILARITY_THRESHOLD]
+    return [
+        {
+            "title": r.title,
+            "category": r.category,
+            "snippet": r.snippet,
+            "similarity": float(r.similarity),
+        }
+        for r in filtered
+    ]
+
+
+def run() -> None:
+    for query in DEFAULT_QUERIES:
+        print(f"=== {query} ===")
+        results = search(query)
+        print_results(results)
+
+
+def print_results(results: list[dict[str, object]]) -> None:
+    if not results:
+        print(f"  결과 없음 (임계값 {SIMILARITY_THRESHOLD:.2f} 미만)\n")
         return
-        
-    for r in filtered:
-        print(f"[{r.similarity:.3f}] {r.title} ({r.category})\n  {r.snippet}\n")
 
-# 테스트 케이스
-print("=== 도자기 ===")
-search("도자기 만들기 체험")
+    for result in results:
+        print(
+            f"[{result['similarity']:.3f}] {result['title']} ({result['category']})\n"
+            f"  {result['snippet']}\n"
+        )
 
-print("=== 존재하지 않는 키워드 ===")
-search("우주여행 로켓 발사")
 
-db.close()
+if __name__ == "__main__":
+    run()
