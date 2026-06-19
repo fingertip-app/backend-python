@@ -48,14 +48,22 @@ class CultureRagService:
         try:
             answer = self._generate_answer(context, safe_query, locale)
         except OpenAIError as error:
-            if locale != "ko":
+            if locale != settings.rag_locale_fallback:
                 logger.warning(
-                    "Generation failed; retrying with Korean fallback",
-                    extra={"locale": locale, "fallback_locale": "ko"},
+                    "Generation failed; retrying with fallback locale",
+                    extra={"original_locale": locale, "fallback_locale": settings.rag_locale_fallback},
                 )
                 try:
-                    answer = self._generate_answer(context, safe_query, "ko")
+                    answer = self._generate_answer(context, safe_query, settings.rag_locale_fallback)
+                    logger.info(
+                        "Fallback locale generation succeeded",
+                        extra={"original_locale": locale, "fallback_locale": settings.rag_locale_fallback},
+                    )
                 except OpenAIError as fallback_error:
+                    logger.error(
+                        "Fallback locale generation failed",
+                        extra={"original_locale": locale, "fallback_locale": settings.rag_locale_fallback},
+                    )
                     raise HTTPException(
                         status_code=status.HTTP_502_BAD_GATEWAY,
                         detail="Generation provider request failed",
@@ -99,13 +107,11 @@ class CultureRagService:
         return result.data[0].embedding
 
     def _search(self, db: Session, embedding: list[float]) -> list[VectorDocument]:
+        max_distance = 1 - settings.rag_similarity_threshold
         statement = (
             select(VectorDocument)
             .where(VectorDocument.embedding.is_not(None))
-            .where(
-                VectorDocument.embedding.cosine_distance(embedding)
-                <= 1 - settings.rag_similarity_threshold
-            )
+            .where(VectorDocument.embedding.cosine_distance(embedding) <= max_distance)
             .order_by(VectorDocument.embedding.cosine_distance(embedding))
             .limit(settings.rag_top_k)
         )

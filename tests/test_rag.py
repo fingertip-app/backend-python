@@ -193,10 +193,11 @@ def test_explain_falls_back_to_korean_when_non_korean_generation_fails(caplog):
     )
     service = CultureRagService(client)
 
-    with caplog.at_level("WARNING", logger="app.services.ai.rag"):
+    with caplog.at_level("INFO", logger="app.services.ai.rag"):
         result = service.explain(FakeDb([item]), "매듭", "en")
 
     assert result["answer"] == "한국어 fallback 응답입니다."
     assert "Locale: en" in client.responses.calls[0]["input"]
     assert "Locale: ko" in client.responses.calls[1]["input"]
-    assert "Generation failed; retrying with Korean fallback" in caplog.text
+    assert "Generation failed; retrying with fallback locale" in caplog.text
+    assert "Fallback locale generation succeeded" in caplog.text
