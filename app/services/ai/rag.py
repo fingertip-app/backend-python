@@ -42,23 +42,25 @@ class CultureRagService:
             for document in documents
         )
         try:
-            response = self.client.responses.create(
-                model=settings.openai_generation_model,
-                instructions=(
-                    "You explain Korean traditional culture using only the supplied source context. "
-                    "If context is insufficient, say so. Answer in the requested locale and do not invent facts."
-                ),
-                input=f"Locale: {locale}\nQuestion: {safe_query}\n\nSource context:\n{context}",
-            )
+            answer = self._generate_answer(context, safe_query, locale)
         except OpenAIError as error:
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="Generation provider request failed",
-            ) from error
+            if locale != "ko":
+                try:
+                    answer = self._generate_answer(context, safe_query, "ko")
+                except OpenAIError as fallback_error:
+                    raise HTTPException(
+                        status_code=status.HTTP_502_BAD_GATEWAY,
+                        detail="Generation provider request failed",
+                    ) from fallback_error
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail="Generation provider request failed",
+                ) from error
 
         try:
             return validate_explain_response({
-                "answer": response.output_text,
+                "answer": answer,
                 "sources": sources,
                 "matchingKeywords": self._matching_keywords(documents),
                 "recommendedCategories": self._categories(documents),
@@ -68,6 +70,17 @@ class CultureRagService:
                 status_code=status.HTTP_502_BAD_GATEWAY,
                 detail="Generation response schema validation failed",
             ) from error
+
+    def _generate_answer(self, context: str, query: str, locale: str) -> str:
+        response = self.client.responses.create(
+            model=settings.openai_generation_model,
+            instructions=(
+                "You explain Korean traditional culture using only the supplied source context. "
+                "If context is insufficient, say so. Answer in the requested locale and do not invent facts."
+            ),
+            input=f"Locale: {locale}\nQuestion: {query}\n\nSource context:\n{context}",
+        )
+        return response.output_text or ""
 
     def _embed(self, query: str) -> list[float]:
         result = self.client.embeddings.create(
