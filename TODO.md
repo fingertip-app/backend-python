@@ -92,7 +92,7 @@
   - [x] OpenAI client lazy init으로 짧은 리뷰 fallback 시 API key 없이 처리
   - [x] route/service 단위 테스트 추가
   - [ ] review batch 요약이 필요하면 별도 batch endpoint로 분리
-  - [ ] 요약 결과 schema validation 고도화
+  - [x] 요약 결과 schema validation 고도화
 - [x] [영진] 핵심 AI 해설 영어 번역 API 또는 locale 응답 구현
   - [x] [결정필요] 별도 번역 API와 `/explain?locale=en` 중 구현 방식 확정
   - [x] 영어 번역 결과와 원문 출처 연결 유지
