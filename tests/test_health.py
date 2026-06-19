@@ -29,13 +29,49 @@ def failing_client():
     return TestClient(app)
 
 
-def test_health(healthy_client) -> None:
+def test_health(healthy_client, monkeypatch) -> None:
+    monkeypatch.setattr("app.main.settings.openai_api_key", "")
+    monkeypatch.setattr("app.main.settings.ai_fallback_enabled", False)
+
     response = healthy_client.get("/health")
-    assert response.status_code == 200
-    assert response.json() == {"status": "ok", "db": "ok"}
+    assert response.status_code == 503
+    assert response.json() == {
+        "status": "degraded",
+        "checks": {
+            "db": "ok",
+            "ai": "missing_openai_api_key",
+            "fallback": "disabled",
+        },
+    }
 
 
 def test_health_degraded_when_db_fails(failing_client) -> None:
     response = failing_client.get("/health")
     assert response.status_code == 503
-    assert response.json() == {"status": "degraded", "db": "error"}
+    assert response.json()["status"] == "degraded"
+    assert response.json()["checks"]["db"] == "error"
+
+
+def test_health_ok_when_db_and_ai_are_configured(healthy_client, monkeypatch) -> None:
+    monkeypatch.setattr("app.main.settings.openai_api_key", "test-key")
+
+    response = healthy_client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+    assert response.json()["checks"]["db"] == "ok"
+    assert response.json()["checks"]["ai"] == "configured"
+
+
+def test_health_reports_fallback_state(healthy_client, monkeypatch) -> None:
+    monkeypatch.setattr("app.main.settings.ai_fallback_enabled", True)
+
+    response = healthy_client.get("/health")
+
+    assert response.json()["checks"]["fallback"] == "enabled"
+
+
+def test_request_id_header_is_returned(healthy_client) -> None:
+    response = healthy_client.get("/health", headers={"X-Request-Id": "req-test-1"})
+
+    assert response.headers["X-Request-Id"] == "req-test-1"

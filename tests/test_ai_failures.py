@@ -212,3 +212,14 @@ def test_ai_explain_fallback_enabled_without_matching_data(client, monkeypatch):
 
     assert response.status_code == 503
     assert response.json()["detail"] == "AI service unavailable"
+
+
+def test_ai_explain_returns_request_id_header(client):
+    response = client.post(
+        "/api/v1/ai/explain",
+        json={"query": "판소리"},
+        headers={**auth_headers(), "X-Request-Id": "ai-req-1"},
+    )
+
+    assert response.status_code == 200
+    assert response.headers["X-Request-Id"] == "ai-req-1"

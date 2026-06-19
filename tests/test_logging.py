@@ -20,3 +20,13 @@ def test_logging_info_in_prod(monkeypatch):
 
     root_logger = logging.getLogger()
     assert root_logger.level == logging.INFO
+
+
+def test_provider_http_logs_do_not_use_debug(monkeypatch):
+    monkeypatch.setattr("app.core.logging.settings.app_env", "local")
+
+    configure_logging()
+
+    assert logging.getLogger("openai").level == logging.WARNING
+    assert logging.getLogger("httpx").level == logging.WARNING
+    assert logging.getLogger("httpcore").level == logging.WARNING

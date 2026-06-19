@@ -2,13 +2,14 @@ import logging
 from collections.abc import Callable
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.api.v1.deps import get_db
 from app.core.config import settings
 from app.core.security import verify_internal_api_key
+from app.schemas.ai import ExplainResponse
 from app.services.ai.fallback_service import FallbackService
 from app.services.ai.rag import CultureRagService, get_culture_rag_service
 from app.services.ai.review_summary import ReviewSummaryService
@@ -33,20 +34,6 @@ class ReviewSummaryResponse(BaseModel):
     keywords: list[str]
 
 
-class SourceResponse(BaseModel):
-    id: int
-    name: str
-    source: str
-    category: str | None = None
-
-
-class ExplainResponse(BaseModel):
-    answer: str
-    sources: list[SourceResponse]
-    matchingKeywords: list[str]
-    recommendedCategories: list[str]
-
-
 def get_culture_rag_service_factory() -> Callable[[], CultureRagService]:
     return get_culture_rag_service
 
@@ -54,21 +41,36 @@ def get_culture_rag_service_factory() -> Callable[[], CultureRagService]:
 @router.post("/explain", response_model=ExplainResponse)
 def explain_culture(
     payload: ExplainRequest,
+    request: Request,
     db: Session = Depends(get_db),
     service_factory: Callable[[], CultureRagService] = Depends(get_culture_rag_service_factory),
 ) -> dict[str, Any]:
+    request_id = getattr(request.state, "request_id", None)
+    logger.info(
+        "AI explain request started",
+        extra={"request_id": request_id, "locale": payload.locale},
+    )
     try:
         service = service_factory()
-        return service.explain(db, payload.query, payload.locale)
+        response = service.explain(db, payload.query, payload.locale)
+        logger.info(
+            "AI explain request completed",
+            extra={"request_id": request_id, "source_count": len(response.get("sources", []))},
+        )
+        return response
     except HTTPException as error:
         if not _should_try_fallback(error):
+            logger.warning(
+                "AI explain request failed",
+                extra={"request_id": request_id, "status_code": error.status_code},
+            )
             raise
 
         fallback = FallbackService().get_fallback_response(payload.query)
         if fallback:
             logger.warning(
                 "AI fallback response served",
-                extra={"query": payload.query, "status_code": error.status_code},
+                extra={"request_id": request_id, "status_code": error.status_code},
             )
             return fallback
 
@@ -77,10 +79,11 @@ def explain_culture(
             detail="AI service unavailable",
         ) from error
     except Exception as error:
-        logger.exception("AI explanation failed unexpectedly")
+        logger.exception("AI explanation failed unexpectedly", extra={"request_id": request_id})
         if settings.ai_fallback_enabled:
             fallback = FallbackService().get_fallback_response(payload.query)
             if fallback:
+                logger.warning("AI fallback response served", extra={"request_id": request_id})
                 return fallback
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -96,12 +99,16 @@ def _should_try_fallback(error: HTTPException) -> bool:
 
 
 @router.post("/review-summary", response_model=ReviewSummaryResponse)
-def review_summary(payload: ReviewSummaryRequest) -> dict[str, Any]:
+def review_summary(payload: ReviewSummaryRequest, request: Request) -> dict[str, Any]:
+    request_id = getattr(request.state, "request_id", None)
+    logger.info("Review summary request started", extra={"request_id": request_id})
     try:
         service = ReviewSummaryService()
-        return service.summarize(payload.content, payload.locale)
+        response = service.summarize(payload.content, payload.locale)
+        logger.info("Review summary request completed", extra={"request_id": request_id})
+        return response
     except Exception as error:
-        logger.exception("Review summary failed unexpectedly")
+        logger.exception("Review summary failed unexpectedly", extra={"request_id": request_id})
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="AI service unavailable",
