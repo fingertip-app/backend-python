@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -6,7 +7,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.db.models import HeritageItem
+from app.db.models import VectorDocument
+from app.schemas.ai import validate_explain_response
+from app.services.ai.privacy import mask_personal_data
+
+
+logger = logging.getLogger(__name__)
 
 
 class CultureRagService:
@@ -14,49 +20,83 @@ class CultureRagService:
         self.client = client
 
     def explain(self, db: Session, query: str, locale: str) -> dict[str, object]:
+        safe_query = mask_personal_data(query)
         try:
-            embedding = self._embed(query)
+            embedding = self._embed(safe_query)
         except OpenAIError as error:
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
                 detail="Embedding provider request failed",
             ) from error
 
-        items = self._search(db, embedding)
-        sources = [self._source(item) for item in items]
+        documents = self._search(db, embedding)
+        sources = [self._source(document) for document in documents]
 
-        if not items:
-            return {
+        if not documents:
+            return validate_explain_response({
                 "answer": "관련 문화유산 자료를 찾지 못했습니다. 질문을 더 구체적으로 입력해 주세요.",
                 "sources": [],
                 "matchingKeywords": [],
                 "recommendedCategories": [],
-            }
+            })
 
         context = "\n\n".join(
-            f"[{item.name} / {item.source}]\n{item.description or ''}\n{item.history or ''}"
-            for item in items
+            f"[{document.title or document.heritage_item.name} / {document.source or document.heritage_item.source}]\n"
+            f"{document.content}"
+            for document in documents
         )
         try:
-            response = self.client.responses.create(
-                model=settings.openai_generation_model,
-                instructions=(
-                    "You explain Korean traditional culture using only the supplied source context. "
-                    "If context is insufficient, say so. Answer in the requested locale and do not invent facts."
-                ),
-                input=f"Locale: {locale}\nQuestion: {query}\n\nSource context:\n{context}",
-            )
+            answer = self._generate_answer(context, safe_query, locale)
         except OpenAIError as error:
+            if locale != settings.rag_locale_fallback:
+                logger.warning(
+                    "Generation failed; retrying with fallback locale",
+                    extra={"original_locale": locale, "fallback_locale": settings.rag_locale_fallback},
+                )
+                try:
+                    answer = self._generate_answer(context, safe_query, settings.rag_locale_fallback)
+                    logger.info(
+                        "Fallback locale generation succeeded",
+                        extra={"original_locale": locale, "fallback_locale": settings.rag_locale_fallback},
+                    )
+                except OpenAIError as fallback_error:
+                    logger.error(
+                        "Fallback locale generation failed",
+                        extra={"original_locale": locale, "fallback_locale": settings.rag_locale_fallback},
+                    )
+                    raise HTTPException(
+                        status_code=status.HTTP_502_BAD_GATEWAY,
+                        detail="Generation provider request failed",
+                    ) from fallback_error
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail="Generation provider request failed",
+                ) from error
+
+        try:
+            return validate_explain_response({
+                "answer": answer,
+                "sources": sources,
+                "matchingKeywords": self._matching_keywords(documents),
+                "recommendedCategories": self._categories(documents),
+            })
+        except ValueError as error:
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="Generation provider request failed",
+                detail="Generation response schema validation failed",
             ) from error
-        return {
-            "answer": response.output_text,
-            "sources": sources,
-            "matchingKeywords": self._matching_keywords(items),
-            "recommendedCategories": self._categories(items),
-        }
+
+    def _generate_answer(self, context: str, query: str, locale: str) -> str:
+        response = self.client.responses.create(
+            model=settings.openai_generation_model,
+            instructions=(
+                "You explain Korean traditional culture using only the supplied source context. "
+                "If context is insufficient, say so. Answer in the requested locale and do not invent facts."
+            ),
+            input=f"Locale: {locale}\nQuestion: {query}\n\nSource context:\n{context}",
+        )
+        return response.output_text or ""
 
     def _embed(self, query: str) -> list[float]:
         result = self.client.embeddings.create(
@@ -66,31 +106,46 @@ class CultureRagService:
         )
         return result.data[0].embedding
 
-    def _search(self, db: Session, embedding: list[float]) -> list[HeritageItem]:
+    def _search(self, db: Session, embedding: list[float]) -> list[VectorDocument]:
+        max_distance = 1 - settings.rag_similarity_threshold
         statement = (
-            select(HeritageItem)
-            .where(HeritageItem.embedding.is_not(None))
-            .order_by(HeritageItem.embedding.cosine_distance(embedding))
+            select(VectorDocument)
+            .where(VectorDocument.embedding.is_not(None))
+            .where(VectorDocument.embedding.cosine_distance(embedding) <= max_distance)
+            .order_by(VectorDocument.embedding.cosine_distance(embedding))
             .limit(settings.rag_top_k)
         )
         return list(db.scalars(statement).all())
 
     @staticmethod
-    def _source(item: HeritageItem) -> dict[str, object]:
+    def _source(document: VectorDocument) -> dict[str, object]:
+        item = document.heritage_item
         return {
             "id": item.id,
-            "name": item.name,
-            "source": item.source,
-            "category": item.category,
+            "name": document.title or item.name,
+            "source": document.source or item.source,
+            "category": document.category or item.category,
         }
 
     @staticmethod
-    def _matching_keywords(items: list[HeritageItem]) -> list[str]:
-        return list(dict.fromkeys(item.name for item in items if item.name))
+    def _matching_keywords(documents: list[VectorDocument]) -> list[str]:
+        return list(
+            dict.fromkeys(
+                (document.title or document.heritage_item.name)
+                for document in documents
+                if document.title or document.heritage_item.name
+            )
+        )
 
     @staticmethod
-    def _categories(items: list[HeritageItem]) -> list[str]:
-        return list(dict.fromkeys(item.category for item in items if item.category))
+    def _categories(documents: list[VectorDocument]) -> list[str]:
+        return list(
+            dict.fromkeys(
+                (document.category or document.heritage_item.category)
+                for document in documents
+                if document.category or document.heritage_item.category
+            )
+        )
 
 
 def get_culture_rag_service() -> CultureRagService:

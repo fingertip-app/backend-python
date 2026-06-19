@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from app.api.v1.routers import ai
 from app.core.config import settings
 from app.main import app
+from app.schemas.ai import validate_review_summary_response
 from app.services.ai.review_summary import ReviewSummaryService
 
 
@@ -57,6 +58,89 @@ def test_review_summary_normalizes_model_response(monkeypatch):
         "keywords": ["전통", "체험", "배움", "공예", "초과"],
     }
     assert service.client.chat.completions.call["model"] == "generation-model"
+
+
+def test_review_summary_rejects_empty_summary():
+    service = ReviewSummaryService(
+        FakeClient('{"summary": "   ", "sentimentScore": 0.7, "keywords": ["친절"]}')
+    )
+
+    with pytest.raises(ValueError, match="Invalid review summary response schema"):
+        service.summarize("친절하고 기억에 남는 전통 체험이었습니다.", "ko")
+
+
+def test_review_summary_normalizes_keywords_before_schema_validation():
+    service = ReviewSummaryService(
+        FakeClient(
+            '{"summary": "즐거운 체험", "sentimentScore": "0.8", '
+            '"keywords": ["공예", 10, null, "  ", "전통"]}'
+        )
+    )
+
+    result = service.summarize("공예를 배우며 전통 문화를 즐겁게 경험했습니다.", "ko")
+
+    assert result == {
+        "summary": "즐거운 체험",
+        "sentimentScore": 0.8,
+        "keywords": ["공예", "전통"],
+    }
+
+
+def test_validate_review_summary_response_rejects_invalid_schema():
+    with pytest.raises(ValueError, match="Invalid review summary response schema"):
+        validate_review_summary_response({
+            "summary": "좋은 체험",
+            "sentimentScore": 1.1,
+            "keywords": ["전통"],
+        })
+
+
+def test_validate_review_summary_response_strips_summary_and_keywords():
+    result = validate_review_summary_response({
+        "summary": "  좋은 체험  ",
+        "sentimentScore": 0.6,
+        "keywords": [" 전통 ", " ", "공예"],
+    })
+
+    assert result == {
+        "summary": "좋은 체험",
+        "sentimentScore": 0.6,
+        "keywords": ["전통", "공예"],
+    }
+
+
+def test_validate_review_summary_response_rejects_blank_summary():
+    with pytest.raises(ValueError, match="Invalid review summary response schema"):
+        validate_review_summary_response({
+            "summary": "   ",
+            "sentimentScore": 0.5,
+            "keywords": [],
+        })
+
+
+def test_review_summary_masks_personal_data_before_model_call():
+    service = ReviewSummaryService(
+        FakeClient('{"summary": "연락처는 제외하고 요약", "sentimentScore": 0.7, "keywords": ["친절"]}')
+    )
+
+    service.summarize("담당자가 john@example.com 와 010-1234-5678로 친절히 안내했습니다.", "ko")
+
+    user_message = service.client.chat.completions.call["messages"][1]["content"]
+    assert "john@example.com" not in user_message
+    assert "010-1234-5678" not in user_message
+    assert "[email]" in user_message
+    assert "[phone]" in user_message
+
+
+def test_review_summary_english_locale_prompt():
+    service = ReviewSummaryService(
+        FakeClient('{"summary": "A satisfying craft class.", "sentimentScore": 0.9, "keywords": ["craft"]}')
+    )
+
+    service.summarize("The instructor was kind and the craft class was memorable.", "en")
+
+    system_message = service.client.chat.completions.call["messages"][0]["content"]
+    assert "in English" in system_message
 
 
 def test_review_summary_short_review_does_not_call_model():

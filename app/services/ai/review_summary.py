@@ -5,6 +5,8 @@ from typing import Any
 from openai import OpenAI
 
 from app.core.config import settings
+from app.schemas.ai import validate_review_summary_response
+from app.services.ai.privacy import mask_personal_data
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +20,11 @@ class ReviewSummaryService:
         self.client = client
 
     def summarize(self, content: str, locale: str) -> dict[str, Any]:
-        normalized_content = content.strip()
+        normalized_content = mask_personal_data(content.strip())
         if len(normalized_content) < MIN_SUMMARY_CONTENT_LENGTH:
-            return self._short_review_response(normalized_content, locale)
+            return validate_review_summary_response(
+                self._short_review_response(normalized_content, locale)
+            )
 
         response = self._client().chat.completions.create(
             model=settings.openai_generation_model,
@@ -43,7 +47,7 @@ class ReviewSummaryService:
             raise ValueError("Empty response from OpenAI")
 
         result = json.loads(response_text)
-        return self._normalize_result(result)
+        return validate_review_summary_response(self._normalize_result(result))
 
     def _client(self) -> OpenAI:
         if self.client is None:
@@ -74,9 +78,9 @@ class ReviewSummaryService:
             raw_keywords = []
 
         keywords = [
-            str(keyword).strip()
+            keyword.strip()
             for keyword in raw_keywords
-            if str(keyword).strip()
+            if isinstance(keyword, str) and keyword.strip()
         ][:MAX_KEYWORDS]
 
         return {

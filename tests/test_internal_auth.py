@@ -31,14 +31,16 @@ def configured_internal_api_key(monkeypatch):
     app.dependency_overrides.clear()
 
 
-def test_health_without_auth(client):
+def test_health_without_auth(client, monkeypatch):
     """Health endpoint should not require authentication."""
     # health check는 DB 접근 필요 (SELECT 1 실행)
+    monkeypatch.setattr(settings, "openai_api_key", "test-openai-key")
     app.dependency_overrides[deps.get_db] = lambda: HealthyDb()
     try:
         response = client.get("/health")
         assert response.status_code == 200
-        assert response.json() == {"status": "ok", "db": "ok"}
+        assert response.json()["status"] == "ok"
+        assert response.json()["checks"]["db"] == "ok"
     finally:
         app.dependency_overrides.pop(deps.get_db, None)
 

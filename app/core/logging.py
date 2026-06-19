@@ -21,3 +21,6 @@ def configure_logging() -> None:
         logger.handlers.clear()
         logger.setLevel(level)
         logger.propagate = True
+
+    for logger_name in ("openai", "httpx", "httpcore"):
+        logging.getLogger(logger_name).setLevel(logging.WARNING)
