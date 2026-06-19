@@ -29,6 +29,17 @@ class FakeResponses:
         return SimpleNamespace(output_text=self.output_text)
 
 
+class FailingThenSuccessfulResponses:
+    def __init__(self) -> None:
+        self.calls = []
+
+    def create(self, **kwargs):
+        self.calls.append(kwargs)
+        if len(self.calls) == 1:
+            raise APIConnectionError(request=None)
+        return SimpleNamespace(output_text="한국어 fallback 응답입니다.")
+
+
 class FakeClient:
     def __init__(self) -> None:
         self.embeddings = FakeEmbeddings()
@@ -162,3 +173,30 @@ def test_explain_rejects_invalid_generation_schema():
 
     assert error.value.status_code == 502
     assert error.value.detail == "Generation response schema validation failed"
+
+
+def test_explain_falls_back_to_korean_when_non_korean_generation_fails(caplog):
+    client = FakeClient()
+    client.responses = FailingThenSuccessfulResponses()
+    heritage_item = SimpleNamespace(
+        id=7,
+        name="매듭장",
+        source="국가유산포털",
+        category="공예",
+    )
+    item = SimpleNamespace(
+        title="매듭장",
+        source="국가유산포털",
+        category="공예",
+        content="전통 매듭 기법",
+        heritage_item=heritage_item,
+    )
+    service = CultureRagService(client)
+
+    with caplog.at_level("WARNING", logger="app.services.ai.rag"):
+        result = service.explain(FakeDb([item]), "매듭", "en")
+
+    assert result["answer"] == "한국어 fallback 응답입니다."
+    assert "Locale: en" in client.responses.calls[0]["input"]
+    assert "Locale: ko" in client.responses.calls[1]["input"]
+    assert "Generation failed; retrying with Korean fallback" in caplog.text
