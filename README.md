@@ -118,3 +118,19 @@ python -c "from app.db.models import VectorDocument, EmbeddingMetadata; print('�
 인증, 체험, 카드뉴스, 예약 등 앱 외부 API 라우트와 서비스 도메인 모델은 v4 책임 범위에서 제거했습니다. FastAPI migration은 `heritage_items`와 vector 검색 인덱스만 관리합니다. 기존 초기 migration을 적용한 개발 DB가 있다면 AI DB를 재생성한 뒤 새 baseline을 적용해야 합니다.
 
 세부 구현 항목과 2026-06-28 완료 일정은 [TODO.md](./TODO.md)를 기준으로 진행합니다.
+
+## Smoke Test
+
+### 벡터 유사도 검색 확인
+```bash
+python scripts/smoke_test.py
+```
+
+기대 결과:
+- `=== 도자기 ===` → 유사도 0.30 이상 결과 반환
+- `=== 존재하지 않는 키워드 ===` → "결과 없음" 출력
+
+### 전체 테스트
+```bash
+pytest tests/
+```
