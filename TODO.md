@@ -93,10 +93,10 @@
   - [x] route/service 단위 테스트 추가
   - [ ] review batch 요약이 필요하면 별도 batch endpoint로 분리
   - [ ] 요약 결과 schema validation 고도화
-- [ ] [영진] 핵심 AI 해설 영어 번역 API 또는 locale 응답 구현
+- [x] [영진] 핵심 AI 해설 영어 번역 API 또는 locale 응답 구현
   - [x] [결정필요] 별도 번역 API와 `/explain?locale=en` 중 구현 방식 확정
   - [x] 영어 번역 결과와 원문 출처 연결 유지
-  - [ ] 번역 실패 시 한국어 원문 fallback
+  - [x] 번역 실패 시 한국어 원문 fallback
 - [ ] [공통] 개인정보성 입력 필터와 모델 호출 실패 처리 점검
   - [x] 전화번호/이메일 등 개인정보성 입력 처리 기준 정리
   - [x] 모델 실패 시 Spring 저장 정책 확인

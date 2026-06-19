@@ -23,3 +23,11 @@ more error cases, and storage decisions that are not needed for the 6/28 MVP.
 
 A separate translation API can be added after MVP if the product needs cached
 translations, user-edited translations, or batch translation of stored content.
+
+## Fallback
+
+When a non-Korean generation request fails at the provider-call layer, FastAPI
+retries the same retrieved source context once with `locale=ko`. The response
+keeps the same source list, matching keywords, and recommended categories. If
+the Korean fallback generation also fails, FastAPI returns the normal provider
+failure error.
