@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -9,6 +10,9 @@ from app.core.config import settings
 from app.db.models import VectorDocument
 from app.schemas.ai import validate_explain_response
 from app.services.ai.privacy import mask_personal_data
+
+
+logger = logging.getLogger(__name__)
 
 
 class CultureRagService:
@@ -45,6 +49,10 @@ class CultureRagService:
             answer = self._generate_answer(context, safe_query, locale)
         except OpenAIError as error:
             if locale != "ko":
+                logger.warning(
+                    "Generation failed; retrying with Korean fallback",
+                    extra={"locale": locale, "fallback_locale": "ko"},
+                )
                 try:
                     answer = self._generate_answer(context, safe_query, "ko")
                 except OpenAIError as fallback_error:
