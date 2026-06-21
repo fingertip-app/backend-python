@@ -224,6 +224,54 @@ def test_search_combined_rank_keeps_strong_vector_match_when_lexical_scores_tie(
     assert ranked[0].title == "매듭장"
 
 
+def test_rank_weights_are_normalized(monkeypatch):
+    monkeypatch.setattr(settings, "rag_vector_rank_weight", 7)
+    monkeypatch.setattr(settings, "rag_lexical_rank_weight", 3)
+
+    assert CultureRagService._rank_weights() == (0.7, 0.3)
+
+
+def test_rank_weights_fall_back_when_configured_weights_are_not_positive(monkeypatch):
+    monkeypatch.setattr(settings, "rag_vector_rank_weight", 0)
+    monkeypatch.setattr(settings, "rag_lexical_rank_weight", -1)
+
+    assert CultureRagService._rank_weights() == (0.7, 0.3)
+
+
+def test_limit_context_documents_caps_distinct_items(monkeypatch):
+    monkeypatch.setattr(settings, "rag_top_k", 2)
+    monkeypatch.setattr(settings, "rag_context_max_chunks", 10)
+    first_item = SimpleNamespace(id=1)
+    second_item = SimpleNamespace(id=2)
+    third_item = SimpleNamespace(id=3)
+    documents = [
+        SimpleNamespace(heritage_item=first_item),
+        SimpleNamespace(heritage_item=first_item),
+        SimpleNamespace(heritage_item=second_item),
+        SimpleNamespace(heritage_item=third_item),
+    ]
+
+    limited = CultureRagService._limit_context_documents(documents)
+
+    assert limited == documents[:3]
+
+
+def test_limit_context_documents_caps_total_chunks(monkeypatch):
+    monkeypatch.setattr(settings, "rag_top_k", 10)
+    monkeypatch.setattr(settings, "rag_context_max_chunks", 2)
+    first_item = SimpleNamespace(id=1)
+    second_item = SimpleNamespace(id=2)
+    documents = [
+        SimpleNamespace(heritage_item=first_item),
+        SimpleNamespace(heritage_item=first_item),
+        SimpleNamespace(heritage_item=second_item),
+    ]
+
+    limited = CultureRagService._limit_context_documents(documents)
+
+    assert limited == documents[:2]
+
+
 def test_query_tokens_do_not_strip_valid_korean_word_edges():
     service = CultureRagService(FakeClient())
 

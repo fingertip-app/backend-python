@@ -200,10 +200,20 @@ class CultureRagService:
     ) -> float:
         _, vector_score, lexical_score = candidate
         normalized_lexical_score = lexical_score / max_lexical_score if max_lexical_score else 0
+        vector_weight, lexical_weight = CultureRagService._rank_weights()
         return (
-            settings.rag_vector_rank_weight * vector_score
-            + settings.rag_lexical_rank_weight * normalized_lexical_score
+            vector_weight * vector_score
+            + lexical_weight * normalized_lexical_score
         )
+
+    @staticmethod
+    def _rank_weights() -> tuple[float, float]:
+        vector_weight = max(settings.rag_vector_rank_weight, 0)
+        lexical_weight = max(settings.rag_lexical_rank_weight, 0)
+        total = vector_weight + lexical_weight
+        if total <= 0:
+            return 0.7, 0.3
+        return vector_weight / total, lexical_weight / total
 
     @classmethod
     def _query_tokens(cls, query: str) -> list[str]:
