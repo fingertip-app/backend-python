@@ -30,7 +30,14 @@ class CultureRagService:
             ) from error
 
         documents = self._search(db, embedding)
-        sources = [self._source(document) for document in documents]
+        # Multiple matched chunks can point to the same heritage item.
+        seen_ids = set()
+        sources = []
+        for document in documents:
+            item_id = document.heritage_item.id
+            if item_id not in seen_ids:
+                seen_ids.add(item_id)
+                sources.append(self._source(document))
 
         if not documents:
             return validate_explain_response({

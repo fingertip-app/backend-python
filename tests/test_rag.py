@@ -93,6 +93,39 @@ def test_explain_retrieves_sources_and_generates_answer(monkeypatch):
     assert client.responses.call["model"] == "generation-model"
 
 
+def test_explain_deduplicates_sources_for_multiple_chunks():
+    client = FakeClient()
+    heritage_item = SimpleNamespace(
+        id=7,
+        name="매듭장",
+        source="국가유산포털",
+        category="공예",
+    )
+    first_chunk = SimpleNamespace(
+        title="매듭장",
+        source="국가유산포털",
+        category="공예",
+        content="전통 매듭 기법",
+        heritage_item=heritage_item,
+    )
+    second_chunk = SimpleNamespace(
+        title="매듭장",
+        source="국가유산포털",
+        category="공예",
+        content="생활 장식 문화",
+        heritage_item=heritage_item,
+    )
+    service = CultureRagService(client)
+
+    result = service.explain(FakeDb([first_chunk, second_chunk]), "매듭", "ko")
+
+    assert result["sources"] == [
+        {"id": 7, "name": "매듭장", "source": "국가유산포털", "category": "공예"}
+    ]
+    assert "전통 매듭 기법" in client.responses.call["input"]
+    assert "생활 장식 문화" in client.responses.call["input"]
+
+
 def test_explain_uses_requested_locale_and_masks_personal_data():
     client = FakeClient()
     heritage_item = SimpleNamespace(
