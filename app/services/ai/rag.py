@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -13,6 +14,42 @@ from app.services.ai.privacy import mask_personal_data
 
 
 logger = logging.getLogger(__name__)
+
+TOKEN_RE = re.compile(r"[0-9A-Za-z가-힣]+")
+QUERY_STOPWORDS = {
+    "대해",
+    "대해서",
+    "알려줘",
+    "알려주세요",
+    "설명",
+    "설명해줘",
+    "설명해주세요",
+    "무엇",
+    "뭐예요",
+    "뭔가요",
+}
+KOREAN_PARTICLE_SUFFIXES = (
+    "으로",
+    "에서",
+    "에게",
+    "부터",
+    "까지",
+    "보다",
+    "처럼",
+    "은",
+    "는",
+    "이",
+    "가",
+    "을",
+    "를",
+    "에",
+    "의",
+    "와",
+    "과",
+    "도",
+    "만",
+    "로",
+)
 
 
 class CultureRagService:
@@ -29,7 +66,7 @@ class CultureRagService:
                 detail="Embedding provider request failed",
             ) from error
 
-        documents = self._search(db, embedding)
+        documents = self._search(db, embedding, safe_query)
         # Multiple matched chunks can point to the same heritage item.
         seen_ids = set()
         sources = []
@@ -113,16 +150,87 @@ class CultureRagService:
         )
         return result.data[0].embedding
 
-    def _search(self, db: Session, embedding: list[float]) -> list[VectorDocument]:
+    def _search(self, db: Session, embedding: list[float], query: str) -> list[VectorDocument]:
         max_distance = 1 - settings.rag_similarity_threshold
         statement = (
             select(VectorDocument)
             .where(VectorDocument.embedding.is_not(None))
             .where(VectorDocument.embedding.cosine_distance(embedding) <= max_distance)
             .order_by(VectorDocument.embedding.cosine_distance(embedding))
-            .limit(settings.rag_top_k)
+            .limit(settings.rag_candidate_k)
         )
-        return list(db.scalars(statement).all())
+        candidates = list(db.scalars(statement).all())
+        ranked = self._rank_with_lexical_boost(candidates, query)
+        return self._limit_context_documents(ranked)
+
+    @classmethod
+    def _rank_with_lexical_boost(
+        cls,
+        documents: list[VectorDocument],
+        query: str,
+    ) -> list[VectorDocument]:
+        tokens = cls._query_tokens(query)
+        if not tokens:
+            return documents
+
+        return sorted(
+            documents,
+            key=lambda document: cls._lexical_score(document, tokens),
+            reverse=True,
+        )
+
+    @classmethod
+    def _query_tokens(cls, query: str) -> list[str]:
+        tokens = []
+        for raw_token in TOKEN_RE.findall(query.lower()):
+            token = cls._strip_particle_suffix(raw_token)
+            if len(token) < 2 or token in QUERY_STOPWORDS:
+                continue
+            tokens.append(token)
+        return list(dict.fromkeys(tokens))
+
+    @staticmethod
+    def _strip_particle_suffix(token: str) -> str:
+        for suffix in KOREAN_PARTICLE_SUFFIXES:
+            if token.endswith(suffix) and len(token) > len(suffix) + 1:
+                return token[: -len(suffix)]
+        return token
+
+    @staticmethod
+    def _lexical_score(document: VectorDocument, tokens: list[str]) -> int:
+        title = (document.title or document.heritage_item.name or "").lower()
+        category = (document.category or document.heritage_item.category or "").lower()
+        source = (document.source or document.heritage_item.source or "").lower()
+        content = (document.content or "").lower()
+
+        score = 0
+        for token in tokens:
+            if token in title:
+                score += 6
+            if token in category:
+                score += 4
+            if token in content:
+                score += 2
+            if token in source:
+                score += 1
+        return score
+
+    @staticmethod
+    def _limit_context_documents(documents: list[VectorDocument]) -> list[VectorDocument]:
+        selected_item_ids = set()
+        selected_documents = []
+
+        for document in documents:
+            item_id = document.heritage_item.id
+            if item_id not in selected_item_ids:
+                if len(selected_item_ids) >= settings.rag_top_k:
+                    continue
+                selected_item_ids.add(item_id)
+            selected_documents.append(document)
+            if len(selected_documents) >= settings.rag_context_max_chunks:
+                break
+
+        return selected_documents
 
     @staticmethod
     def _source(document: VectorDocument) -> dict[str, object]:

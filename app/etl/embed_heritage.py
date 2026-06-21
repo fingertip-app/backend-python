@@ -22,6 +22,18 @@ CHUNK_OVERLAP = 100
 DELAY = 0.5  # OpenAI API 과호출 방지
 
 
+def build_embedding_text(item: HeritageItem, chunk: str) -> str:
+    """검색 단서가 청크마다 유지되도록 핵심 metadata를 함께 임베딩한다."""
+    parts = [
+        f"이름: {item.name}",
+        f"분류: {item.category}" if item.category else "",
+        f"출처: {item.source}",
+        f"역사: {item.history}" if item.history else "",
+        f"본문: {chunk}",
+    ]
+    return "\n".join(part for part in parts if part)
+
+
 def chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> list[str]:
     """텍스트를 chunk_size 단위로 분할. overlap만큼 앞 내용 포함."""
     if len(text) <= chunk_size:
@@ -117,7 +129,7 @@ def process_item(client: OpenAI, db: Session, item: HeritageItem) -> None:
         db.query(VectorDocument).filter_by(heritage_item_id=item.id).delete()
 
         for idx, chunk in enumerate(chunks):
-            embedding = get_embedding(client, chunk)
+            embedding = get_embedding(client, build_embedding_text(item, chunk))
             db.add(VectorDocument(
                 heritage_item_id=item.id,
                 chunk_index=idx,

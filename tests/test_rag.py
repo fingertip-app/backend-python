@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from openai import APIConnectionError
 
 from app.core.config import settings
+from app.etl.embed_heritage import build_embedding_text
 from app.services.ai.rag import CultureRagService, get_culture_rag_service
 
 
@@ -93,6 +94,23 @@ def test_explain_retrieves_sources_and_generates_answer(monkeypatch):
     assert client.responses.call["model"] == "generation-model"
 
 
+def test_build_embedding_text_includes_search_metadata():
+    heritage_item = SimpleNamespace(
+        name="자수장",
+        source="국가유산포털",
+        category="공예",
+        history="조선시대 궁중 수방에서 발달했다.",
+    )
+
+    text = build_embedding_text(heritage_item, "비단에 수를 놓는 전통 기술")
+
+    assert "이름: 자수장" in text
+    assert "분류: 공예" in text
+    assert "출처: 국가유산포털" in text
+    assert "역사: 조선시대 궁중 수방에서 발달했다." in text
+    assert "본문: 비단에 수를 놓는 전통 기술" in text
+
+
 def test_explain_deduplicates_sources_for_multiple_chunks():
     client = FakeClient()
     heritage_item = SimpleNamespace(
@@ -124,6 +142,54 @@ def test_explain_deduplicates_sources_for_multiple_chunks():
     ]
     assert "전통 매듭 기법" in client.responses.call["input"]
     assert "생활 장식 문화" in client.responses.call["input"]
+
+
+def test_search_lexical_boost_promotes_keyword_matches():
+    client = FakeClient()
+    weak_vector_match = SimpleNamespace(
+        id=1,
+        name="탈춤",
+        source="국가유산포털",
+        category="연희",
+    )
+    exact_keyword_match = SimpleNamespace(
+        id=2,
+        name="자수장",
+        source="국가유산포털",
+        category="공예",
+    )
+    candidates = [
+        SimpleNamespace(
+            title="탈춤",
+            source="국가유산포털",
+            category="연희",
+            content="조선 후기 민속 연희",
+            heritage_item=weak_vector_match,
+        ),
+        SimpleNamespace(
+            title="자수장",
+            source="국가유산포털",
+            category="공예",
+            content="조선시대 궁중 자수와 수방 문화",
+            heritage_item=exact_keyword_match,
+        ),
+    ]
+    service = CultureRagService(client)
+
+    ranked = service._rank_with_lexical_boost(candidates, "조선시대 궁중 자수에 대해 알려주세요")
+
+    assert ranked[0].title == "자수장"
+
+
+def test_query_tokens_do_not_strip_valid_korean_word_edges():
+    service = CultureRagService(FakeClient())
+
+    tokens = service._query_tokens("도자기 만들기와 가야금에 대해 알려주세요")
+
+    assert "도자기" in tokens
+    assert "가야금" in tokens
+    assert "자기" not in tokens
+    assert "야금" not in tokens
 
 
 def test_explain_uses_requested_locale_and_masks_personal_data():

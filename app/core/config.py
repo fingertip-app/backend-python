@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     openai_generation_model: str = "gpt-4o-mini"
     rag_locale_fallback: str = "ko"
     rag_top_k: int = 20
+    rag_candidate_k: int = 100
+    rag_context_max_chunks: int = 30
     rag_similarity_threshold: float = 0.20
     internal_api_key: str = ""
     ai_fallback_enabled: bool = False
