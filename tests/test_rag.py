@@ -57,9 +57,9 @@ class FakeDb:
         self.items = items
         self.statement = None
 
-    def scalars(self, statement):
+    def execute(self, statement):
         self.statement = statement
-        return SimpleNamespace(all=lambda: self.items)
+        return SimpleNamespace(all=lambda: [(item, 0.2) for item in self.items])
 
 
 def test_explain_retrieves_sources_and_generates_answer(monkeypatch):
@@ -176,9 +176,52 @@ def test_search_lexical_boost_promotes_keyword_matches():
     ]
     service = CultureRagService(client)
 
-    ranked = service._rank_with_lexical_boost(candidates, "조선시대 궁중 자수에 대해 알려주세요")
+    ranked = service._rank_with_lexical_boost(
+        [(candidates[0], 0.23), (candidates[1], 0.22)],
+        "조선시대 궁중 자수에 대해 알려주세요",
+    )
 
     assert ranked[0].title == "자수장"
+
+
+def test_search_combined_rank_keeps_strong_vector_match_when_lexical_scores_tie():
+    client = FakeClient()
+    strong_vector_match = SimpleNamespace(
+        id=1,
+        name="매듭장",
+        source="국가유산포털",
+        category="공예",
+    )
+    weak_vector_match = SimpleNamespace(
+        id=2,
+        name="자수장",
+        source="국가유산포털",
+        category="공예",
+    )
+    candidates = [
+        SimpleNamespace(
+            title="매듭장",
+            source="국가유산포털",
+            category="공예",
+            content="전통 공예 기술",
+            heritage_item=strong_vector_match,
+        ),
+        SimpleNamespace(
+            title="자수장",
+            source="국가유산포털",
+            category="공예",
+            content="전통 공예 기술",
+            heritage_item=weak_vector_match,
+        ),
+    ]
+    service = CultureRagService(client)
+
+    ranked = service._rank_with_lexical_boost(
+        [(candidates[0], 0.8), (candidates[1], 0.3)],
+        "전통 공예",
+    )
+
+    assert ranked[0].title == "매듭장"
 
 
 def test_query_tokens_do_not_strip_valid_korean_word_edges():

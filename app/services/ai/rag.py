@@ -152,31 +152,57 @@ class CultureRagService:
 
     def _search(self, db: Session, embedding: list[float], query: str) -> list[VectorDocument]:
         max_distance = 1 - settings.rag_similarity_threshold
+        distance = VectorDocument.embedding.cosine_distance(embedding).label("distance")
         statement = (
-            select(VectorDocument)
+            select(VectorDocument, distance)
             .where(VectorDocument.embedding.is_not(None))
-            .where(VectorDocument.embedding.cosine_distance(embedding) <= max_distance)
-            .order_by(VectorDocument.embedding.cosine_distance(embedding))
+            .where(distance <= max_distance)
+            .order_by(distance)
             .limit(settings.rag_candidate_k)
         )
-        candidates = list(db.scalars(statement).all())
+        candidates = [
+            (document, 1 - float(distance_value))
+            for document, distance_value in db.execute(statement).all()
+        ]
         ranked = self._rank_with_lexical_boost(candidates, query)
         return self._limit_context_documents(ranked)
 
     @classmethod
     def _rank_with_lexical_boost(
         cls,
-        documents: list[VectorDocument],
+        candidates: list[tuple[VectorDocument, float]],
         query: str,
     ) -> list[VectorDocument]:
         tokens = cls._query_tokens(query)
         if not tokens:
-            return documents
+            return [document for document, _ in candidates]
 
-        return sorted(
-            documents,
-            key=lambda document: cls._lexical_score(document, tokens),
+        scored_candidates = [
+            (document, vector_score, cls._lexical_score(document, tokens))
+            for document, vector_score in candidates
+        ]
+        max_lexical_score = max(
+            (lexical_score for _, _, lexical_score in scored_candidates),
+            default=0,
+        )
+
+        ranked_candidates = sorted(
+            scored_candidates,
+            key=lambda candidate: cls._combined_rank_score(candidate, max_lexical_score),
             reverse=True,
+        )
+        return [document for document, _, _ in ranked_candidates]
+
+    @staticmethod
+    def _combined_rank_score(
+        candidate: tuple[VectorDocument, float, int],
+        max_lexical_score: int,
+    ) -> float:
+        _, vector_score, lexical_score = candidate
+        normalized_lexical_score = lexical_score / max_lexical_score if max_lexical_score else 0
+        return (
+            settings.rag_vector_rank_weight * vector_score
+            + settings.rag_lexical_rank_weight * normalized_lexical_score
         )
 
     @classmethod
