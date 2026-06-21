@@ -15,6 +15,9 @@ from app.services.ai.privacy import mask_personal_data
 
 logger = logging.getLogger(__name__)
 
+# Lightweight tokenization: matches Korean syllables (가-힣), ASCII alphanumeric.
+# Intentionally excludes Hanja (陶瓷器), special punctuation (·, -, etc) for simplicity.
+# Example: "청자·백자" → ["청자", "백자"], "陶瓷器" → []
 TOKEN_RE = re.compile(r"[0-9A-Za-z가-힣]+")
 QUERY_STOPWORDS = {
     "대해",
@@ -160,10 +163,18 @@ class CultureRagService:
             .order_by(distance)
             .limit(settings.rag_candidate_k)
         )
-        candidates = [
-            (document, 1 - float(distance_value))
-            for document, distance_value in db.execute(statement).all()
-        ]
+        raw_results = db.execute(statement).all()
+        candidates = []
+        for row in raw_results:
+            try:
+                document, distance_value = row
+                candidates.append((document, 1 - float(distance_value)))
+            except (ValueError, TypeError) as error:
+                logger.error(
+                    "Failed to unpack vector search result row",
+                    extra={"error": str(error), "row": str(row)[:100]}
+                )
+                continue
         ranked = self._rank_with_lexical_boost(candidates, query)
         return self._limit_context_documents(ranked)
 
@@ -212,6 +223,14 @@ class CultureRagService:
         lexical_weight = max(settings.rag_lexical_rank_weight, 0)
         total = vector_weight + lexical_weight
         if total <= 0:
+            logger.warning(
+                "Invalid rank weight configuration, using fallback weights",
+                extra={
+                    "vector_weight": settings.rag_vector_rank_weight,
+                    "lexical_weight": settings.rag_lexical_rank_weight,
+                    "fallback": "(0.7, 0.3)"
+                }
+            )
             return 0.7, 0.3
         return vector_weight / total, lexical_weight / total
 
@@ -227,6 +246,15 @@ class CultureRagService:
 
     @staticmethod
     def _strip_particle_suffix(token: str) -> str:
+        """
+        Strip Korean particles from token if the remaining stem would be >= 2 chars.
+
+        Boundary condition: len(token) > len(suffix) + 1 ensures minimum 2-char stem.
+        Examples:
+            - "도자기에" (4 chars) → "도자기" (3 chars stem, ✓)
+            - "나는" (2 chars) → "나는" (1 char stem would remain, ✗ preserved)
+            - "매듭으로" (4 chars) → "매듭" (2 chars stem, ✓)
+        """
         for suffix in KOREAN_PARTICLE_SUFFIXES:
             if token.endswith(suffix) and len(token) > len(suffix) + 1:
                 return token[: -len(suffix)]
@@ -253,6 +281,21 @@ class CultureRagService:
 
     @staticmethod
     def _limit_context_documents(documents: list[VectorDocument]) -> list[VectorDocument]:
+        """
+        Limit context to top-K distinct heritage items and max total chunks.
+
+        Greedy algorithm: processes ranked documents sequentially, prioritizing:
+        1. First `rag_top_k` distinct heritage items
+        2. Total chunks limited to `rag_context_max_chunks`
+
+        Note: Early-ranked documents may contribute multiple chunks before
+        later documents are included. This favors higher-ranked items.
+
+        Example with rag_top_k=2, rag_context_max_chunks=5:
+            Input: [item1_chunk1, item1_chunk2, item1_chunk3, item2_chunk1, item3_chunk1]
+            Output: [item1_chunk1, item1_chunk2, item1_chunk3, item2_chunk1, item3_chunk1][:5]
+                     (item3 included because chunk limit not reached after item2)
+        """
         selected_item_ids = set()
         selected_documents = []
 
