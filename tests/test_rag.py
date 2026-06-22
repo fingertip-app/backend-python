@@ -254,6 +254,7 @@ def test_limit_context_documents_caps_distinct_items(monkeypatch):
     limited = CultureRagService._limit_context_documents(documents)
 
     assert limited == documents[:3]
+    assert third_item.id not in {document.heritage_item.id for document in limited}
 
 
 def test_limit_context_documents_caps_total_chunks(monkeypatch):
