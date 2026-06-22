@@ -10,11 +10,20 @@ from app.api.v1 import deps
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.logging import configure_logging
+from app.db.session import SessionLocal
+from app.services.ai.rag import CultureRagService
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     configure_logging()
+
+    db = SessionLocal()
+    try:
+        CultureRagService.init_idf_cache(db)
+    finally:
+        db.close()
+
     yield
 
 
