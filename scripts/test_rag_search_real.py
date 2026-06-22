@@ -10,6 +10,7 @@ def main(query: str):
     db = SessionLocal()
     client = OpenAI(api_key=settings.openai_api_key)
     service = CultureRagService(client)
+    CultureRagService.init_idf_cache(db)  
 
     embedding = service._embed(query)
     documents = service._search(db, embedding, query)
