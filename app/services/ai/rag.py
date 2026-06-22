@@ -1,5 +1,7 @@
 import logging
+import math
 import re
+from collections import Counter
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -8,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.db.models import VectorDocument
+from app.db.models import HeritageItem, VectorDocument
 from app.schemas.ai import validate_explain_response
 from app.services.ai.privacy import mask_personal_data
 
@@ -56,6 +58,11 @@ KOREAN_PARTICLE_SUFFIXES = (
 
 
 class CultureRagService:
+    # 토큰별 IDF(Inverse Document Frequency) 캐시.
+    # 앱 시작 시 init_idf_cache()로 1회 채워짐. None이면 _get_idf가 1.0(가중치 없음)으로 폴백해
+    # 기존 동작(가중치 미적용)과 동일하게 동작한다 — 캐시 초기화 누락/실패가 서비스 장애로 번지지 않도록 함.
+    _idf_cache: dict[str, float] | None = None
+
     def __init__(self, client: Any) -> None:
         self.client = client
 
@@ -206,8 +213,8 @@ class CultureRagService:
 
     @staticmethod
     def _combined_rank_score(
-        candidate: tuple[VectorDocument, float, int],
-        max_lexical_score: int,
+        candidate: tuple[VectorDocument, float, float],
+        max_lexical_score: float,
     ) -> float:
         _, vector_score, lexical_score = candidate
         normalized_lexical_score = lexical_score / max_lexical_score if max_lexical_score else 0
@@ -260,23 +267,95 @@ class CultureRagService:
                 return token[: -len(suffix)]
         return token
 
-    @staticmethod
-    def _lexical_score(document: VectorDocument, tokens: list[str]) -> int:
+    @classmethod
+    def init_idf_cache(cls, db: Session) -> None:
+        """
+        앱 시작 시(lifespan) 1회 호출해 IDF 캐시를 초기화한다.
+
+        실패해도 서비스 자체는 동작해야 하므로 예외를 흡수하고 캐시를 None으로 둔다.
+        캐시가 None이면 _get_idf가 1.0을 반환해 기존 동작(가중치 미적용)과 동일하게 동작한다.
+        """
+        try:
+            cls._idf_cache = cls._compute_idf(db)
+            logger.info(
+                "RAG IDF cache initialized",
+                extra={"token_count": len(cls._idf_cache)},
+            )
+        except Exception as error:
+            logger.error(
+                "Failed to initialize RAG IDF cache; falling back to unweighted lexical score",
+                extra={"error": str(error)},
+            )
+            cls._idf_cache = None
+
+    @classmethod
+    def _compute_idf(cls, db: Session) -> dict[str, float]:
+        """
+        heritage_items 전체를 스캔해 토큰별 IDF를 계산한다.
+
+        공식: idf(token) = log(전체 문서 수 / 그 토큰을 포함한 문서 수) + 1
+        +1 smoothing: 모든 문서에 등장하는 토큰(idf=log(1)=0)도 최소 가중치 1을 갖게 해,
+        기존 점수 체계(가중치 미적용 시 곱 1)와 자연스럽게 연결되도록 함.
+
+        문서 단위는 heritage_item(80건) 기준 — vector_documents(청크) 단위로 하면
+        청크 수가 많은 항목(예: 14개)의 토큰이 과대 집계되어 IDF가 왜곡됨.
+        """
+        items = db.query(HeritageItem).all()
+        total_docs = len(items)
+        if total_docs == 0:
+            return {}
+
+        doc_freq: Counter[str] = Counter()
+        for item in items:
+            text = " ".join(
+                filter(None, [item.name, item.category, item.description, item.history])
+            )
+            unique_tokens = set(cls._query_tokens(text))
+            for token in unique_tokens:
+                doc_freq[token] += 1
+
+        return {
+            token: math.log(total_docs / freq) + 1
+            for token, freq in doc_freq.items()
+        }
+
+    @classmethod
+    def _get_idf(cls, token: str) -> float:
+        """
+        토큰의 IDF 가중치를 반환한다.
+
+        - 캐시 미초기화(None) 시: 1.0 반환 → 기존 동작과 동일 (가중치 없음)
+        - 캐시에 있는 토큰: 계산된 IDF 반환
+        - 캐시에 없는 토큰(80건 어디에도 안 나타난, 질의에만 있는 매우 희귀한 단어):
+          캐시 내 최댓값으로 처리 (가장 희귀한 토큰과 동등하게 취급)
+        """
+        if not cls._idf_cache:
+            return 1.0
+        if token in cls._idf_cache:
+            return cls._idf_cache[token]
+        return max(cls._idf_cache.values(), default=1.0)
+
+    @classmethod
+    def _lexical_score(cls, document: VectorDocument, tokens: list[str]) -> float:
         title = (document.title or document.heritage_item.name or "").lower()
         category = (document.category or document.heritage_item.category or "").lower()
         source = (document.source or document.heritage_item.source or "").lower()
         content = (document.content or "").lower()
 
-        score = 0
+        score = 0.0
         for token in tokens:
+            # IDF를 제곱해 영향력을 키운다 — 단순 곱(idf^1)로는 title 위치 가중치(6)가
+            # 흔한 토큰(낮은 idf)에도 크게 작용해, "흔한 단어가 title에 있는 문서"가
+            # "희귀한 단어가 content에 있는 문서"보다 부당하게 유리해지는 역전이 발생했음.
+            idf_sq = cls._get_idf(token) ** 2
             if token in title:
-                score += 6
+                score += 6 * idf_sq
             if token in category:
-                score += 4
+                score += 4 * idf_sq
             if token in content:
-                score += 2
+                score += 2 * idf_sq
             if token in source:
-                score += 1
+                score += 1 * idf_sq
         return score
 
     @staticmethod
