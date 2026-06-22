@@ -293,8 +293,8 @@ class CultureRagService:
 
         Example with rag_top_k=2, rag_context_max_chunks=5:
             Input: [item1_chunk1, item1_chunk2, item1_chunk3, item2_chunk1, item3_chunk1]
-            Output: [item1_chunk1, item1_chunk2, item1_chunk3, item2_chunk1, item3_chunk1][:5]
-                     (item3 included because chunk limit not reached after item2)
+            Output: [item1_chunk1, item1_chunk2, item1_chunk3, item2_chunk1]
+                    (item3 excluded because top-K distinct items are already selected)
         """
         selected_item_ids = set()
         selected_documents = []
