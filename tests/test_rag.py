@@ -391,3 +391,58 @@ def test_explain_falls_back_to_korean_when_non_korean_generation_fails(caplog):
     assert "Locale: ko" in client.responses.calls[1]["input"]
     assert "Generation failed; retrying with fallback locale" in caplog.text
     assert "Fallback locale generation succeeded" in caplog.text
+
+
+def test_get_idf_falls_back_to_one_when_cache_not_initialized(monkeypatch):
+    monkeypatch.setattr(CultureRagService, "_idf_cache", None)
+
+    assert CultureRagService._get_idf("도자기") == 1.0
+
+
+def test_lexical_score_weights_rare_tokens_more_than_common_tokens(monkeypatch):
+    monkeypatch.setattr(
+        CultureRagService,
+        "_idf_cache",
+        {"도자기": 5.0, "전통": 1.5},
+    )
+    heritage_item = SimpleNamespace(
+        id=1,
+        name="옹기장",
+        source="국가유산포털",
+        category="공예",
+    )
+    rare_in_content = SimpleNamespace(
+        title="옹기장",
+        source="국가유산포털",
+        category="공예",
+        content="도자기를 만드는 전통 기술",
+        heritage_item=heritage_item,
+    )
+
+    score = CultureRagService._lexical_score(rare_in_content, ["도자기", "전통"])
+
+    expected = 2 * (5.0 ** 2) + 2 * (1.5 ** 2)
+    assert score == pytest.approx(expected)
+
+
+def test_cap_chunks_per_item_limits_candidates_per_heritage_item(monkeypatch):
+    monkeypatch.setattr(settings, "rag_max_chunks_per_item", 3)
+    heritage_item = SimpleNamespace(id=1)
+    other_item = SimpleNamespace(id=2)
+    candidates = [
+        (SimpleNamespace(heritage_item=heritage_item), 0.9),
+        (SimpleNamespace(heritage_item=heritage_item), 0.8),
+        (SimpleNamespace(heritage_item=heritage_item), 0.7),
+        (SimpleNamespace(heritage_item=heritage_item), 0.6),
+        (SimpleNamespace(heritage_item=other_item), 0.5),
+    ]
+
+    capped = CultureRagService._cap_chunks_per_item(
+        candidates, settings.rag_max_chunks_per_item
+    )
+
+    heritage_item_count = sum(1 for doc, _ in capped if doc.heritage_item.id == 1)
+    assert heritage_item_count == 3
+    assert len(capped) == 4
+    assert capped[0][1] == 0.9
+    assert capped[2][1] == 0.7
