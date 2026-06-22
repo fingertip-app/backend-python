@@ -7,7 +7,14 @@ from app.core.config import settings
 from app.db.session import SessionLocal
 
 SIMILARITY_THRESHOLD = float(os.getenv("SMOKE_SIMILARITY_THRESHOLD", "0.30"))
-DEFAULT_QUERIES = ("도자기 만들기 체험", "판소리 배우기", "우주여행 로켓 발사")
+DEFAULT_QUERIES = (
+    "조선시대 궁중 자수에 대해 알려주세요",
+    "한산모시짜기에 대해 알려주세요",
+    "판소리 배우고 싶어요",
+    "매듭 공예가 뭐예요",
+    "도자기 만드는 전통 기술",
+    "우주여행 로켓 발사",
+)
 
 
 def search(query: str, top_k: int = 5, category: str | None = None) -> list[dict[str, object]]:

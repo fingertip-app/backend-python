@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -13,6 +14,45 @@ from app.services.ai.privacy import mask_personal_data
 
 
 logger = logging.getLogger(__name__)
+
+# Lightweight tokenization: matches Korean syllables (가-힣), ASCII alphanumeric.
+# Intentionally excludes Hanja (陶瓷器), special punctuation (·, -, etc) for simplicity.
+# Example: "청자·백자" → ["청자", "백자"], "陶瓷器" → []
+TOKEN_RE = re.compile(r"[0-9A-Za-z가-힣]+")
+QUERY_STOPWORDS = {
+    "대해",
+    "대해서",
+    "알려줘",
+    "알려주세요",
+    "설명",
+    "설명해줘",
+    "설명해주세요",
+    "무엇",
+    "뭐예요",
+    "뭔가요",
+}
+KOREAN_PARTICLE_SUFFIXES = (
+    "으로",
+    "에서",
+    "에게",
+    "부터",
+    "까지",
+    "보다",
+    "처럼",
+    "은",
+    "는",
+    "이",
+    "가",
+    "을",
+    "를",
+    "에",
+    "의",
+    "와",
+    "과",
+    "도",
+    "만",
+    "로",
+)
 
 
 class CultureRagService:
@@ -29,7 +69,7 @@ class CultureRagService:
                 detail="Embedding provider request failed",
             ) from error
 
-        documents = self._search(db, embedding)
+        documents = self._search(db, embedding, safe_query)
         # Multiple matched chunks can point to the same heritage item.
         seen_ids = set()
         sources = []
@@ -113,16 +153,163 @@ class CultureRagService:
         )
         return result.data[0].embedding
 
-    def _search(self, db: Session, embedding: list[float]) -> list[VectorDocument]:
+    def _search(self, db: Session, embedding: list[float], query: str) -> list[VectorDocument]:
         max_distance = 1 - settings.rag_similarity_threshold
+        distance = VectorDocument.embedding.cosine_distance(embedding).label("distance")
         statement = (
-            select(VectorDocument)
+            select(VectorDocument, distance)
             .where(VectorDocument.embedding.is_not(None))
-            .where(VectorDocument.embedding.cosine_distance(embedding) <= max_distance)
-            .order_by(VectorDocument.embedding.cosine_distance(embedding))
-            .limit(settings.rag_top_k)
+            .where(distance <= max_distance)
+            .order_by(distance)
+            .limit(settings.rag_candidate_k)
         )
-        return list(db.scalars(statement).all())
+        raw_results = db.execute(statement).all()
+        candidates = []
+        for row in raw_results:
+            try:
+                document, distance_value = row
+                candidates.append((document, 1 - float(distance_value)))
+            except (ValueError, TypeError) as error:
+                logger.error(
+                    "Failed to unpack vector search result row",
+                    extra={"error": str(error), "row": str(row)[:100]}
+                )
+                continue
+        ranked = self._rank_with_lexical_boost(candidates, query)
+        return self._limit_context_documents(ranked)
+
+    @classmethod
+    def _rank_with_lexical_boost(
+        cls,
+        candidates: list[tuple[VectorDocument, float]],
+        query: str,
+    ) -> list[VectorDocument]:
+        tokens = cls._query_tokens(query)
+        if not tokens:
+            return [document for document, _ in candidates]
+
+        scored_candidates = [
+            (document, vector_score, cls._lexical_score(document, tokens))
+            for document, vector_score in candidates
+        ]
+        max_lexical_score = max(
+            (lexical_score for _, _, lexical_score in scored_candidates),
+            default=0,
+        )
+
+        ranked_candidates = sorted(
+            scored_candidates,
+            key=lambda candidate: cls._combined_rank_score(candidate, max_lexical_score),
+            reverse=True,
+        )
+        return [document for document, _, _ in ranked_candidates]
+
+    @staticmethod
+    def _combined_rank_score(
+        candidate: tuple[VectorDocument, float, int],
+        max_lexical_score: int,
+    ) -> float:
+        _, vector_score, lexical_score = candidate
+        normalized_lexical_score = lexical_score / max_lexical_score if max_lexical_score else 0
+        vector_weight, lexical_weight = CultureRagService._rank_weights()
+        return (
+            vector_weight * vector_score
+            + lexical_weight * normalized_lexical_score
+        )
+
+    @staticmethod
+    def _rank_weights() -> tuple[float, float]:
+        vector_weight = max(settings.rag_vector_rank_weight, 0)
+        lexical_weight = max(settings.rag_lexical_rank_weight, 0)
+        total = vector_weight + lexical_weight
+        if total <= 0:
+            logger.warning(
+                "Invalid rank weight configuration, using fallback weights",
+                extra={
+                    "vector_weight": settings.rag_vector_rank_weight,
+                    "lexical_weight": settings.rag_lexical_rank_weight,
+                    "fallback": "(0.7, 0.3)"
+                }
+            )
+            return 0.7, 0.3
+        return vector_weight / total, lexical_weight / total
+
+    @classmethod
+    def _query_tokens(cls, query: str) -> list[str]:
+        tokens = []
+        for raw_token in TOKEN_RE.findall(query.lower()):
+            token = cls._strip_particle_suffix(raw_token)
+            if len(token) < 2 or token in QUERY_STOPWORDS:
+                continue
+            tokens.append(token)
+        return list(dict.fromkeys(tokens))
+
+    @staticmethod
+    def _strip_particle_suffix(token: str) -> str:
+        """
+        Strip Korean particles from token if the remaining stem would be >= 2 chars.
+
+        Boundary condition: len(token) > len(suffix) + 1 ensures minimum 2-char stem.
+        Examples:
+            - "도자기에" (4 chars) → "도자기" (3 chars stem, ✓)
+            - "나는" (2 chars) → "나는" (1 char stem would remain, ✗ preserved)
+            - "매듭으로" (4 chars) → "매듭" (2 chars stem, ✓)
+        """
+        for suffix in KOREAN_PARTICLE_SUFFIXES:
+            if token.endswith(suffix) and len(token) > len(suffix) + 1:
+                return token[: -len(suffix)]
+        return token
+
+    @staticmethod
+    def _lexical_score(document: VectorDocument, tokens: list[str]) -> int:
+        title = (document.title or document.heritage_item.name or "").lower()
+        category = (document.category or document.heritage_item.category or "").lower()
+        source = (document.source or document.heritage_item.source or "").lower()
+        content = (document.content or "").lower()
+
+        score = 0
+        for token in tokens:
+            if token in title:
+                score += 6
+            if token in category:
+                score += 4
+            if token in content:
+                score += 2
+            if token in source:
+                score += 1
+        return score
+
+    @staticmethod
+    def _limit_context_documents(documents: list[VectorDocument]) -> list[VectorDocument]:
+        """
+        Limit context to top-K distinct heritage items and max total chunks.
+
+        Greedy algorithm: processes ranked documents sequentially, prioritizing:
+        1. First `rag_top_k` distinct heritage items
+        2. Total chunks limited to `rag_context_max_chunks`
+
+        Note: Early-ranked documents may contribute multiple chunks before
+        later documents are included. This favors higher-ranked items.
+
+        Example with rag_top_k=2, rag_context_max_chunks=5:
+            Input: [item1_chunk1, item1_chunk2, item1_chunk3, item2_chunk1, item3_chunk1]
+            Output: [item1_chunk1, item1_chunk2, item1_chunk3, item2_chunk1]
+                    (item3 excluded because top-K distinct items are already selected)
+        """
+        selected_item_ids = set()
+        selected_documents = []
+
+        for document in documents:
+            item_id = document.heritage_item.id
+            if item_id not in selected_item_ids:
+                if len(selected_item_ids) >= settings.rag_top_k:
+                    continue
+                selected_item_ids.add(item_id)
+            selected_documents.append(document)
+            if len(selected_documents) >= settings.rag_context_max_chunks:
+                break
+
+        return selected_documents
 
     @staticmethod
     def _source(document: VectorDocument) -> dict[str, object]:
