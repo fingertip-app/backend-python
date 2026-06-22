@@ -182,8 +182,33 @@ class CultureRagService:
                     extra={"error": str(error), "row": str(row)[:100]}
                 )
                 continue
+        candidates = self._cap_chunks_per_item(candidates, settings.rag_max_chunks_per_item)
         ranked = self._rank_with_lexical_boost(candidates, query)
         return self._limit_context_documents(ranked)
+
+    @staticmethod
+    def _cap_chunks_per_item(
+        candidates: list[tuple[VectorDocument, float]],
+        max_per_item: int,
+    ) -> list[tuple[VectorDocument, float]]:
+        """
+        동일 heritage_item이 candidate 슬롯을 과점하지 못하도록 item당 청크 수를 제한한다.
+
+        텍스트가 길어 청크가 많이 생긴 항목(예: 14개)이 candidate_k 슬롯을 독점하면,
+        텍스트가 짧아 청크가 적은 항목(예: 자수장 2개)이 슬롯 부족으로 밀려나는
+        구조적 불균형이 생긴다. candidates는 이미 벡터 거리순으로 정렬되어 들어오므로,
+        item별로 더 가까운(앞에 나온) 청크가 우선적으로 살아남는다.
+        """
+        item_counts: dict[int, int] = {}
+        capped = []
+        for document, score in candidates:
+            item_id = document.heritage_item.id
+            count = item_counts.get(item_id, 0)
+            if count >= max_per_item:
+                continue
+            item_counts[item_id] = count + 1
+            capped.append((document, score))
+        return capped
 
     @classmethod
     def _rank_with_lexical_boost(
