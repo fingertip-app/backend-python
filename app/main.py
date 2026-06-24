@@ -17,6 +17,20 @@ from app.services.ai.rag import CultureRagService
 
 logger = logging.getLogger(__name__)
 
+# 로그에 기록할 최대 바디 길이 (바이트)
+MAX_BODY_LOG_LENGTH = 1024
+
+
+def _get_safe_body_preview(body_bytes: bytes) -> str:
+    """
+    요청 본문을 안전하게 로깅하기 위해 truncate 처리.
+    민감 정보 노출 방지 및 로그 볼륨 제어.
+    """
+    if len(body_bytes) > MAX_BODY_LOG_LENGTH:
+        preview = body_bytes[:MAX_BODY_LOG_LENGTH].decode("utf-8", errors="replace")
+        return f"{preview}...[truncated, total: {len(body_bytes)} bytes]"
+    return body_bytes.decode("utf-8", errors="replace")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -38,12 +52,24 @@ app.include_router(api_router, prefix="/api/v1")
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     request_id = getattr(request.state, "request_id", None)
+
+    # Body를 안전하게 읽기 (이미 소비되었을 수 있음)
+    try:
+        body_bytes = await request.body()
+        body_preview = _get_safe_body_preview(body_bytes)
+    except Exception:
+        body_preview = "[body read failed]"
+
+    # errors()를 직렬화 안전하게 처리
+    error_details = str(exc.errors())
+
     logger.warning(
         "Request validation failed",
         extra={
             "request_id": request_id,
-            "errors": exc.errors(),
-            "body": await request.body(),
+            "error_count": len(exc.errors()),
+            "error_details": error_details,
+            "body_preview": body_preview,
         },
     )
     return JSONResponse(

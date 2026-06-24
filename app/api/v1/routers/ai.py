@@ -17,9 +17,24 @@ from app.services.ai.review_summary import ReviewSummaryService
 router = APIRouter(dependencies=[Depends(verify_internal_api_key)])
 logger = logging.getLogger(__name__)
 
+# 로그에 기록할 최대 쿼리 길이
+MAX_QUERY_LOG_LENGTH = 200
+# API가 허용하는 최대 쿼리 길이
+MAX_QUERY_LENGTH = 5000
+
+
+def _get_safe_query_preview(query: str) -> str:
+    """
+    쿼리를 안전하게 로깅하기 위해 truncate 처리.
+    민감 정보 노출 방지 및 로그 볼륨 제어.
+    """
+    if len(query) > MAX_QUERY_LOG_LENGTH:
+        return f"{query[:MAX_QUERY_LOG_LENGTH]}...[truncated, total: {len(query)} chars]"
+    return query
+
 
 class ExplainRequest(BaseModel):
-    query: str = Field(min_length=1, description="사용자 질문 (최소 1자)")
+    query: str = Field(min_length=1, max_length=MAX_QUERY_LENGTH, description="사용자 질문 (최소 1자, 최대 5000자)")
     locale: str = Field(default="ko", description="언어 코드")
 
 
@@ -46,11 +61,12 @@ def explain_culture(
     service_factory: Callable[[], CultureRagService] = Depends(get_culture_rag_service_factory),
 ) -> dict[str, Any]:
     request_id = getattr(request.state, "request_id", None)
+    query_preview = _get_safe_query_preview(payload.query)
     logger.info(
         "AI explain request started",
         extra={
             "request_id": request_id,
-            "query": payload.query,
+            "query_preview": query_preview,
             "query_length": len(payload.query),
             "locale": payload.locale,
         },
