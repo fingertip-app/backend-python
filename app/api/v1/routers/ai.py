@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 class ExplainRequest(BaseModel):
-    query: str = Field(min_length=1, description="사용자 질문 (최소 1자)")
-    locale: str = Field(default="ko", description="언어 코드")
+    query: str = Field(min_length=1)
+    locale: str = "ko"
 
 
 class ReviewSummaryRequest(BaseModel):
@@ -48,12 +48,7 @@ def explain_culture(
     request_id = getattr(request.state, "request_id", None)
     logger.info(
         "AI explain request started",
-        extra={
-            "request_id": request_id,
-            "query": payload.query,
-            "query_length": len(payload.query),
-            "locale": payload.locale,
-        },
+        extra={"request_id": request_id, "locale": payload.locale},
     )
     try:
         service = service_factory()

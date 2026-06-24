@@ -1,9 +1,7 @@
 from contextlib import asynccontextmanager
-import logging
 import uuid
 
 from fastapi import Depends, FastAPI, Request, status
-from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -14,8 +12,6 @@ from app.core.config import settings
 from app.core.logging import configure_logging
 from app.db.session import SessionLocal
 from app.services.ai.rag import CultureRagService
-
-logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -33,28 +29,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 app.include_router(api_router, prefix="/api/v1")
-
-
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    request_id = getattr(request.state, "request_id", None)
-    logger.warning(
-        "Request validation failed",
-        extra={
-            "request_id": request_id,
-            "errors": exc.errors(),
-            "body": await request.body(),
-        },
-    )
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content={
-            "success": False,
-            "message": "AI query validation failed",
-            "errorCode": "INVALID_REQUEST",
-            "details": exc.errors(),
-        },
-    )
 
 
 @app.middleware("http")
