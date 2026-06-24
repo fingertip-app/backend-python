@@ -146,7 +146,11 @@ class CultureRagService:
             model=settings.openai_generation_model,
             instructions=(
                 "You explain Korean traditional culture using only the supplied source context. "
-                "If context is insufficient, say so. Answer in the requested locale and do not invent facts."
+                "If context is insufficient, say so. Answer in the requested locale and do not invent facts. "
+                "When recommending experiences, focus on these app categories: "
+                "전통섬유, 전통모자, 전통의복, 전통매듭, 전통음악, 전통공연, 전통종이, 백자, 도자기, "
+                "궁중자수, 바느질, 발효, 막걸리, 물레체험, 채색체험, 소품만들기, 체험형, 하회탈, "
+                "국가무형유산, 조선시대, 판소리, 장단, 닥나무, 노리개, 배색, 시음체험, 핸드빌딩"
             ),
             input=f"Locale: {locale}\nQuestion: {query}\n\nSource context:\n{context}",
         )
@@ -427,23 +431,130 @@ class CultureRagService:
 
     @staticmethod
     def _matching_keywords(documents: list[VectorDocument]) -> list[str]:
-        return list(
+        """Extract keywords and map to app tags"""
+        heritage_keywords = list(
             dict.fromkeys(
                 (document.title or document.heritage_item.name)
                 for document in documents
                 if document.title or document.heritage_item.name
             )
         )
+        return CultureRagService._map_to_app_tags(heritage_keywords)
 
     @staticmethod
     def _categories(documents: list[VectorDocument]) -> list[str]:
-        return list(
+        """Extract categories and map to app tags"""
+        heritage_categories = list(
             dict.fromkeys(
                 (document.category or document.heritage_item.category)
                 for document in documents
                 if document.category or document.heritage_item.category
             )
         )
+        return CultureRagService._map_to_app_tags(heritage_categories)
+
+    @staticmethod
+    def _map_to_app_tags(heritage_terms: list[str]) -> list[str]:
+        """Map heritage keywords/categories to app experience tags"""
+        # App tags available in the experience database
+        APP_TAGS = {
+            "전통섬유", "전통모자", "전통의복", "전통매듭", "전통음악", "전통공연",
+            "전통종이", "백자", "궁중자수", "바느질", "발효", "막걸리",
+            "물레체험", "채색체험", "소품만들기", "체험형", "하회탈",
+            "국가무형유산", "조선시대", "판소리", "장단", "닥나무",
+            "노리개", "배색", "시음체험", "핸드빌딩", "여름공예", "충북",
+            "도자기"
+        }
+
+        # Mapping rules: heritage term -> app tag
+        MAPPING = {
+            # Textiles
+            "한산모시짜기": "전통섬유",
+            "모시": "전통섬유",
+            "삼베": "전통섬유",
+            "직조": "전통섬유",
+
+            # Hats and accessories
+            "갓일": "전통모자",
+            "망건": "전통모자",
+            "갓": "전통모자",
+
+            # Traditional clothing
+            "한복생활": "전통의복",
+            "한복": "전통의복",
+
+            # Knots
+            "매듭장": "전통매듭",
+            "매듭": "전통매듭",
+            "노리개": "노리개",
+
+            # Music and performance
+            "판소리": "판소리",
+            "가야금산조": "전통음악",
+            "가야금": "전통음악",
+            "악기장": "전통음악",
+            "처용무": "전통공연",
+            "탈춤": "하회탈",
+            "가면극": "하회탈",
+
+            # Paper crafts
+            "한지": "전통종이",
+            "닥나무": "닥나무",
+            "지장": "전통종이",
+
+            # Ceramics
+            "백자": "백자",
+            "청자": "도자기",
+            "도자기": "도자기",
+            "사기장": "도자기",
+            "물레": "물레체험",
+
+            # Embroidery
+            "자수": "궁중자수",
+            "바느질": "바느질",
+
+            # Fermented foods
+            "김치": "발효",
+            "장 담그기": "발효",
+            "막걸리": "막걸리",
+            "발효": "발효",
+
+            # Food
+            "한식": "발효",
+            "전통음식": "발효",
+
+            # Traditional knowledge
+            "전통기술": "국가무형유산",
+            "국가무형문화재": "국가무형유산",
+
+            # Era
+            "조선": "조선시대",
+            "궁중": "궁중자수",
+        }
+
+        mapped_tags = set()
+
+        for term in heritage_terms:
+            term_lower = term.lower()
+
+            # Direct mapping
+            if term in MAPPING:
+                mapped_tags.add(MAPPING[term])
+
+            # Partial match
+            for key, value in MAPPING.items():
+                if key in term or term in key:
+                    mapped_tags.add(value)
+
+            # Direct match with app tags
+            if term in APP_TAGS:
+                mapped_tags.add(term)
+
+        # Always include generic craft tags
+        mapped_tags.add("소품만들기")
+        mapped_tags.add("체험형")
+
+        return list(mapped_tags)
 
 
 def get_culture_rag_service() -> CultureRagService:
