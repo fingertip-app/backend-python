@@ -66,6 +66,7 @@ class ExperienceRagService:
                 "recommendedExperienceIds": [],
                 "reasons": {},
                 "matchingKeywords": [],
+                "sources": [],
             }
 
         # AI 답변 생성
@@ -83,6 +84,15 @@ class ExperienceRagService:
                 for exp in experiences
             },
             "matchingKeywords": self._extract_keywords(experiences),
+            "sources": [
+                {
+                    "id": exp.id,
+                    "name": exp.title,
+                    "source": "experiences",
+                    "category": exp.category,
+                }
+                for exp in experiences
+            ],
         }
 
     def _embed(self, text: str) -> list[float]:

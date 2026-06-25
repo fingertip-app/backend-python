@@ -192,6 +192,7 @@ def get_recommendations(
             "recommendedExperienceIds": response["recommendedExperienceIds"],
             "reasons": response.get("reasons", {}),
             "matchingKeywords": response.get("matchingKeywords", []),
+            "sources": response.get("sources", []),
             "fallback": False,
             "message": None,
         }
@@ -207,6 +208,7 @@ def get_recommendations(
             "recommendedExperienceIds": [],
             "reasons": {},
             "matchingKeywords": [],
+            "sources": [],
             "fallback": True,
             "message": "AI 서비스가 일시적으로 불안정합니다.",
         }
@@ -217,6 +219,7 @@ def get_recommendations(
             "recommendedExperienceIds": [],
             "reasons": {},
             "matchingKeywords": [],
+            "sources": [],
             "fallback": True,
             "message": "AI 서비스가 일시적으로 불안정합니다.",
         }

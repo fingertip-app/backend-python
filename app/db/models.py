@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum as PyEnum
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
@@ -62,3 +62,33 @@ class EmbeddingMetadata(Base):
     error_message = Column(Text)
     embedded_at = Column(DateTime)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class Experience(Base):
+    """체험 프로그램 모델 (Spring Boot Experience 엔티티와 동기화)"""
+    __tablename__ = "experiences"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=False)
+    cultural_story = Column(Text)
+    category = Column(String(100), nullable=False)
+    price = Column(Integer, nullable=False)
+    duration_minutes = Column(Integer, nullable=False)
+    max_participants = Column(Integer, nullable=False)
+    difficulty = Column(String(20))
+    location_address = Column(Text)
+    location_lat = Column(String(20))
+    location_lng = Column(String(20))
+    is_active = Column(Boolean, nullable=False, default=True)
+
+    # AI 추천용 벡터 임베딩
+    description_embedding = Column(Vector(1536))
+
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
+
+    __table_args__ = (
+        Index('ix_experiences_is_active', 'is_active'),
+        Index('ix_experiences_category', 'category'),
+    )
