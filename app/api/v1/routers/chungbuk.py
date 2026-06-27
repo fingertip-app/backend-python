@@ -1,4 +1,5 @@
 import logging
+import secrets
 from collections.abc import Callable
 from datetime import datetime, timezone
 from typing import Any
@@ -71,6 +72,9 @@ def register_chungbuk_artisan(payload: ChungbukArtisanCreateRequest) -> dict:
         "bio": payload.bio,
         "profile_image_url": payload.profile_image_url,
         "address": payload.address,
+        # 장인 전용 대시보드(예약 확인) 접근용 고정 토큰. 정식 로그인 시스템은 아니지만
+        # URL/엔드포인트를 안다고 아무나 다른 장인의 예약을 볼 수는 없게 막는다.
+        "access_token": secrets.token_urlsafe(16),
     }
     artisans.append(artisan)
     write_json(ARTISANS_FILE, artisans)
@@ -238,9 +242,30 @@ def create_chungbuk_reservation(payload: ChungbukReservationCreateRequest) -> di
     return reservation
 
 
-@router.get("/reservations", response_model=list[ChungbukReservationResponse])
-def list_chungbuk_reservations() -> list[dict]:
-    return read_json(RESERVATIONS_FILE, default=[])
+def _verify_artisan_token(artisan_id: int, token: str) -> dict:
+    artisans = read_json(ARTISANS_FILE)
+    for artisan in artisans:
+        if artisan["id"] == artisan_id:
+            if not secrets.compare_digest(artisan.get("access_token", ""), token):
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token")
+            return artisan
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Artisan not found")
+
+
+@router.get("/artisans/{artisan_id}/reservations", response_model=list[ChungbukReservationResponse])
+def list_artisan_reservations(artisan_id: int, token: str) -> list[dict]:
+    """
+    장인 전용 예약 확인. 정식 로그인(Supabase JWT) 검증 대신, 장인별 고정 토큰
+    (access_token)으로 접근을 제한한다 - URL/엔드포인트를 안다고 아무나 다른 장인의
+    예약을 보지 못하게 막는 최소한의 보호. 시간 압박으로 인한 임시 타협.
+    """
+    _verify_artisan_token(artisan_id, token)
+
+    experiences = read_json(EXPERIENCES_FILE)
+    my_experience_ids = {e["id"] for e in experiences if e.get("artisan_id") == artisan_id}
+
+    reservations = read_json(RESERVATIONS_FILE, default=[])
+    return [r for r in reservations if r["experience_id"] in my_experience_ids]
 
 
 # ---------- KPI ----------
