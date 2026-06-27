@@ -1,5 +1,7 @@
 from pathlib import Path
+from typing import Any
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # 프로젝트 루트 기준 절대 경로. uvicorn을 어느 디렉토리에서 실행해도 동일한 위치를 가리킨다.
@@ -8,6 +10,18 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+
+    @model_validator(mode="before")
+    @classmethod
+    def _drop_blank_env_values(cls, data: Any) -> Any:
+        """
+        .env에 'KEY=' 처럼 값을 안 채운 줄이 있으면, pydantic이 빈 문자열을 int/bool로
+        변환하려다 ValidationError로 앱이 통째로 안 뜬다. 빈 문자열은 "값 없음"으로 보고
+        제거해서 선언된 기본값이 적용되도록 한다.
+        """
+        if isinstance(data, dict):
+            return {key: value for key, value in data.items() if value != ""}
+        return data
 
     app_name: str = "장인과 하루 API"
     app_env: str = "local"
