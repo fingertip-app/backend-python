@@ -3,7 +3,7 @@
     "id": 1,
     "title": "충북 연계 - 택견 이야기",
     "content_type": "chungbuk_local",
-    "image_url": null,
+    "image_url": "https://picsum.photos/seed/chungbuk-cardnews-1/800/450",
     "ai_explanation": "국가무형유산 '택견'은 충청북도 충주시에서 전승되는 충청북도 무형유산입니다.",
     "is_active": true
   },
@@ -11,7 +11,7 @@
     "id": 2,
     "title": "충북 연계 - 청주 농악 이야기",
     "content_type": "chungbuk_local",
-    "image_url": null,
+    "image_url": "https://picsum.photos/seed/chungbuk-cardnews-2/800/450",
     "ai_explanation": "충청북도 무형유산 '청주 농악'은 충청북도 청주시에서 전승되는 충청북도 무형유산입니다.",
     "is_active": true
   },
@@ -19,7 +19,7 @@
     "id": 3,
     "title": "충북 연계 - 영동 설계리 농요 이야기",
     "content_type": "chungbuk_local",
-    "image_url": null,
+    "image_url": "https://picsum.photos/seed/chungbuk-cardnews-3/800/450",
     "ai_explanation": "충청북도 무형유산 '영동 설계리 농요'은 충청북도 영동군에서 전승되는 충청북도 무형유산입니다.",
     "is_active": true
   },
@@ -27,7 +27,7 @@
     "id": 4,
     "title": "충북 연계 - 제천 오티별신제 이야기",
     "content_type": "chungbuk_local",
-    "image_url": null,
+    "image_url": "https://picsum.photos/seed/chungbuk-cardnews-4/800/450",
     "ai_explanation": "충청북도 무형유산 '제천 오티별신제'은 충청북도 제천시에서 전승되는 충청북도 무형유산입니다.",
     "is_active": true
   },
@@ -35,7 +35,7 @@
     "id": 5,
     "title": "충북 연계 - 진천 용몽리 농요 이야기",
     "content_type": "chungbuk_local",
-    "image_url": null,
+    "image_url": "https://picsum.photos/seed/chungbuk-cardnews-5/800/450",
     "ai_explanation": "충청북도 무형유산 '진천 용몽리 농요'은 충청북도 진천군에서 전승되는 충청북도 무형유산입니다.",
     "is_active": true
   },
@@ -43,7 +43,7 @@
     "id": 6,
     "title": "충북 연계 - 충청도 앉은굿 이야기",
     "content_type": "chungbuk_local",
-    "image_url": null,
+    "image_url": "https://picsum.photos/seed/chungbuk-cardnews-6/800/450",
     "ai_explanation": "충청북도 무형유산 '충청도 앉은굿'은 충청북도 청주시에서 전승되는 충청북도 무형유산입니다.",
     "is_active": true
   },
@@ -51,7 +51,7 @@
     "id": 7,
     "title": "충북 연계 - 단양 구인사 삼회향놀이 이야기",
     "content_type": "chungbuk_local",
-    "image_url": null,
+    "image_url": "https://picsum.photos/seed/chungbuk-cardnews-7/800/450",
     "ai_explanation": "충청북도 무형유산 '단양 구인사 삼회향놀이'은 충청북도 단양군에서 전승되는 충청북도 무형유산입니다.",
     "is_active": true
   },
@@ -59,7 +59,7 @@
     "id": 8,
     "title": "충북 연계 - 석암제 시조창 이야기",
     "content_type": "chungbuk_local",
-    "image_url": null,
+    "image_url": "https://picsum.photos/seed/chungbuk-cardnews-8/800/450",
     "ai_explanation": "충청북도 무형유산 '석암제 시조창'은 충청북도 청주시에서 전승되는 충청북도 무형유산입니다.",
     "is_active": true
   },
@@ -67,7 +67,7 @@
     "id": 9,
     "title": "충북 연계 - 옥천 교평리 강줄당기기 이야기",
     "content_type": "chungbuk_local",
-    "image_url": null,
+    "image_url": "https://picsum.photos/seed/chungbuk-cardnews-9/800/450",
     "ai_explanation": "충청북도 무형유산 '옥천 교평리 강줄당기기'은 충청북도 옥천군 교평3길 3 (청산면, 교평마을회관)에서 전승되는 충청북도 무형유산입니다.",
     "is_active": true
   }
