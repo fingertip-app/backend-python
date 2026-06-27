@@ -154,6 +154,15 @@ class ChungbukTouristSpotResponse(BaseModel):
     open_cycle: str | None = None
     market_day: str | None = None
     note: str | None = None
+    # 관광명소(tourInfo/attr.do) 전용 필드 - 전통시장 데이터에는 없어 null로 채워짐
+    lat: str | None = None
+    lng: str | None = None
+    tour_type: str | None = None
+    intro: str | None = None
+    image_url: str | None = None
+    hours: str | None = None
+    tel: str | None = None
+    url: str | None = None
 
 
 @router.get("/tourist-spots", response_model=list[ChungbukTouristSpotResponse])
