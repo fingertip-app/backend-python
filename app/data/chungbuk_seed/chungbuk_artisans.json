@@ -1,0 +1,202 @@
+[
+  {
+    "id": 1,
+    "name": "임인호",
+    "heritage_category": "금속활자장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "국가무형유산 '금속활자장' 보유자/단체. 공예 분야.",
+    "profile_image_url": null,
+    "address": "충청북도"
+  },
+  {
+    "id": 2,
+    "name": "원광식",
+    "heritage_category": "주철장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "국가무형유산 '주철장' 보유자/단체. 공예 분야.",
+    "profile_image_url": null,
+    "address": "충청북도"
+  },
+  {
+    "id": 3,
+    "name": "김영조",
+    "heritage_category": "낙화장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "국가무형유산 '낙화장' 보유자/단체. 미술 분야.",
+    "profile_image_url": null,
+    "address": "충청북도"
+  },
+  {
+    "id": 4,
+    "name": "김영기",
+    "heritage_category": "충주 청명주",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '충주 청명주' 보유자/단체. 무형유산 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 충주시"
+  },
+  {
+    "id": 5,
+    "name": "신형철",
+    "heritage_category": "보은 송로주",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '보은 송로주' 보유자/단체. 식생활 분야.",
+    "profile_image_url": null,
+    "address": "충북 보은군 속리산면 삼가구병길 180-9 (구병리)"
+  },
+  {
+    "id": 6,
+    "name": "박준미",
+    "heritage_category": "청주 신선주",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '청주 신선주' 보유자/단체. 무형유산 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 청주시 상당구 것대로 5 (산성동, 청주신선주)"
+  },
+  {
+    "id": 7,
+    "name": "홍종진",
+    "heritage_category": "배첩장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '배첩장' 보유자/단체. 무형유산 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 청주시"
+  },
+  {
+    "id": 8,
+    "name": "이종성",
+    "heritage_category": "사기장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '사기장' 보유자/단체. 무형유산 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 충주시"
+  },
+  {
+    "id": 9,
+    "name": "김명일",
+    "heritage_category": "야장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '야장' 보유자/단체. 무형유산 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 충주시"
+  },
+  {
+    "id": 10,
+    "name": "김광환",
+    "heritage_category": "소목장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '소목장' 보유자/단체. 공예 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 청주시"
+  },
+  {
+    "id": 11,
+    "name": "양태현",
+    "heritage_category": "궁시장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '궁시장' 보유자/단체. 공예 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 청주시"
+  },
+  {
+    "id": 12,
+    "name": "한지장",
+    "heritage_category": "한지장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '한지장' 보유자/단체. 공예 분야.",
+    "profile_image_url": null,
+    "address": "충청북도"
+  },
+  {
+    "id": 13,
+    "name": "신명식",
+    "heritage_category": "자석벼루장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '자석벼루장' 보유자/단체. 무형유산 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 단양군"
+  },
+  {
+    "id": 14,
+    "name": "조준석",
+    "heritage_category": "악기장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '악기장' 보유자/단체. 무형유산 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 영동군"
+  },
+  {
+    "id": 15,
+    "name": "하명석",
+    "heritage_category": "목불조각장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '목불조각장' 보유자/단체. 그 밖의 공연·예술 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 보은군"
+  },
+  {
+    "id": 16,
+    "name": "신재언",
+    "heritage_category": "대목장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '대목장' 보유자/단체. 건축 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 청주시"
+  },
+  {
+    "id": 17,
+    "name": "박갑술",
+    "heritage_category": "주물유기장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '주물유기장' 보유자/단체. 무형유산 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 충주시"
+  },
+  {
+    "id": 18,
+    "name": "김성호",
+    "heritage_category": "칠장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '칠장' 보유자/단체. 무형유산 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 청주시"
+  },
+  {
+    "id": 19,
+    "name": "박영덕",
+    "heritage_category": "보은 각자장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '보은 각자장' 보유자/단체. 공예 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 보은군"
+  },
+  {
+    "id": 20,
+    "name": "유필무",
+    "heritage_category": "증평 필장",
+    "certification_number": null,
+    "is_chungbuk_certified": true,
+    "bio": "충청북도 무형유산 '증평 필장' 보유자/단체. 공예 분야.",
+    "profile_image_url": null,
+    "address": "충청북도 증평군"
+  }
+]

@@ -5,7 +5,6 @@ from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
-import app.db.chungbuk_models  # noqa: F401
 import app.db.models  # noqa: F401
 from app.db.base import Base
 

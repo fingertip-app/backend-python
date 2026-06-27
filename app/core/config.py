@@ -1,4 +1,9 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# 프로젝트 루트 기준 절대 경로. uvicorn을 어느 디렉토리에서 실행해도 동일한 위치를 가리킨다.
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings(BaseSettings):
@@ -23,6 +28,9 @@ class Settings(BaseSettings):
     ai_fallback_enabled: bool = False
     ai_fallback_data_path: str = "app/data/ai_fallback_responses.json"
     chungbuk_cors_origins: str = ""
+    # 코드 폴더 밖의 경로. git pull/배포 시 데이터가 덮어써지지 않도록 분리.
+    # 운영(EC2): /var/lib/chungbuk-api/data, 로컬 개발: 기본값(repo 내 chungbuk_data) 사용
+    chungbuk_data_dir: str = str(_PROJECT_ROOT / "chungbuk_data")
 
 
 settings = Settings()

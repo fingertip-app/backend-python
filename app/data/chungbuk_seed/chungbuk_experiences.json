@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "title": "예시 체험 - 옹기 만들기",
+    "description": "충북 옹기장과 함께하는 체험 예시. 실제 데이터로 교체 필요.",
+    "artisan_id": 1,
+    "region": "충북",
+    "price": 30000,
+    "duration_minutes": 90,
+    "max_participants": 6,
+    "image_url": null,
+    "location": "충청북도 청주시"
+  }
+]
