@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 
 from app.schemas.ai import ExplainResponse
+from app.services.chungbuk.auth import get_optional_supabase_user_id, require_supabase_user_id
 from app.services.chungbuk.data_store import next_id, read_json, write_json
 from app.services.chungbuk.experience_recommend import (
     ChungbukExperienceRecommendService,
@@ -217,13 +218,21 @@ class ChungbukReservationResponse(BaseModel):
     contact: str
     status: str
     created_at: str
+    user_id: str | None = None
 
 
 @router.post(
     "/reservations", response_model=ChungbukReservationResponse, status_code=status.HTTP_201_CREATED
 )
-def create_chungbuk_reservation(payload: ChungbukReservationCreateRequest) -> dict:
-    """체험 예약 신청 (데모용 - 결제/일정 관리 없이 신청 상태만 기록)"""
+def create_chungbuk_reservation(
+    payload: ChungbukReservationCreateRequest,
+    user_id: str | None = Depends(get_optional_supabase_user_id),
+) -> dict:
+    """
+    체험 예약 신청 (데모용 - 결제/일정 관리 없이 신청 상태만 기록).
+    로그인 없이도 예약 가능하지만, Authorization 헤더에 유효한 Supabase JWT가 있으면
+    user_id를 같이 저장해서 나중에 "내 예약 목록"(GET /reservations/mine)에서 조회할 수 있다.
+    """
     experiences = read_json(EXPERIENCES_FILE)
     if not any(e["id"] == payload.experience_id for e in experiences):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
@@ -236,10 +245,18 @@ def create_chungbuk_reservation(payload: ChungbukReservationCreateRequest) -> di
         "contact": payload.contact,
         "status": "신청",
         "created_at": datetime.now(timezone.utc).isoformat(),
+        "user_id": user_id,
     }
     reservations.append(reservation)
     write_json(RESERVATIONS_FILE, reservations)
     return reservation
+
+
+@router.get("/reservations/mine", response_model=list[ChungbukReservationResponse])
+def list_my_reservations(user_id: str = Depends(require_supabase_user_id)) -> list[dict]:
+    """로그인한 사용자 본인이 신청한 예약 목록. Authorization: Bearer <supabase JWT> 필수."""
+    reservations = read_json(RESERVATIONS_FILE, default=[])
+    return [r for r in reservations if r.get("user_id") == user_id]
 
 
 def _verify_artisan_token(artisan_id: int, token: str) -> dict:

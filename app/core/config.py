@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     # 코드 폴더 밖의 경로. git pull/배포 시 데이터가 덮어써지지 않도록 분리.
     # 운영(EC2): /var/lib/chungbuk-api/data, 로컬 개발: 기본값(repo 내 chungbuk_data) 사용
     chungbuk_data_dir: str = str(_PROJECT_ROOT / "chungbuk_data")
+    # 일반 사용자 "내 예약 목록"용. 손끝과 같은 Supabase 프로젝트의 JWT secret(Auth는 공유하기로 했음).
+    # 비워두면 로그인 사용자 식별 기능(내 예약 목록)만 비활성화되고 나머지는 그대로 동작한다.
+    supabase_jwt_secret: str = ""
 
 
 settings = Settings()
