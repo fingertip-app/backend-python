@@ -8,6 +8,10 @@ from pydantic import BaseModel, Field
 
 from app.schemas.ai import ExplainResponse
 from app.services.chungbuk.data_store import next_id, read_json, write_json
+from app.services.chungbuk.experience_recommend import (
+    ChungbukExperienceRecommendService,
+    get_chungbuk_experience_recommend_service,
+)
 from app.services.chungbuk.rag import ChungbukRagService, get_chungbuk_rag_service
 
 router = APIRouter()
@@ -104,6 +108,35 @@ class ChungbukExperienceResponse(BaseModel):
 def list_chungbuk_experiences() -> list[dict]:
     """충북 체험 프로그램 목록"""
     return read_json(EXPERIENCES_FILE)
+
+
+class ChungbukExperienceRecommendItem(ChungbukExperienceResponse):
+    similarity: float
+
+
+class ChungbukExperienceRecommendRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=500)
+    top_k: int = Field(default=5, ge=1, le=20)
+
+
+def _get_chungbuk_experience_recommend_service_factory() -> (
+    Callable[[], ChungbukExperienceRecommendService]
+):
+    return get_chungbuk_experience_recommend_service
+
+
+@router.post("/experiences/recommend", response_model=list[ChungbukExperienceRecommendItem])
+def recommend_chungbuk_experiences(
+    payload: ChungbukExperienceRecommendRequest,
+    service_factory: Callable[[], ChungbukExperienceRecommendService] = Depends(
+        _get_chungbuk_experience_recommend_service_factory
+    ),
+) -> list[dict]:
+    """
+    체험 추천 (임베딩 유사도 검색). 동일 유사도 구간일 경우 region=충북 체험을 우선 노출한다.
+    """
+    service = service_factory()
+    return service.recommend(payload.query, payload.top_k)
 
 
 # ---------- 카드뉴스 ----------

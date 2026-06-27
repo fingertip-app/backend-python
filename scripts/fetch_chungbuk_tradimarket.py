@@ -2,8 +2,9 @@
 충청북도 전통시장 현황 Open API에서 데이터를 받아와
 app/data/chungbuk_seed/chungbuk_tourist_spots.json 으로 저장하는 1회성 스크립트.
 
-사용법:
-    TRADI_MARKET_SERVICE_KEY="<디코딩 인증키>" uv run python scripts/fetch_chungbuk_tradimarket.py
+사용법 (둘 중 하나):
+    1) .env에 TRADI_MARKET_SERVICE_KEY=<디코딩 인증키> 추가 후: uv run python scripts/fetch_chungbuk_tradimarket.py
+    2) TRADI_MARKET_SERVICE_KEY="<디코딩 인증키>" uv run python scripts/fetch_chungbuk_tradimarket.py
 
 API 문서: OpenAPI활용가이드_[충청북도_전통시장 현황]_v1.0.docx
 """
@@ -14,6 +15,10 @@ import sys
 import urllib.parse
 import urllib.request
 from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_URL = "https://apis.data.go.kr/6430000/tradiMarketStatService/getTradiMarketStat"
 PER_PAGE = 100
