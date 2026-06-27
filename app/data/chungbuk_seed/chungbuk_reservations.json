@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "experience_id": 1,
+    "user_name": "김민지",
+    "contact": "010-1234-5678",
+    "status": "확정",
+    "created_at": "2026-06-24T18:45:44.530135+00:00"
+  },
+  {
+    "id": 2,
+    "experience_id": 4,
+    "user_name": "이서준",
+    "contact": "010-2345-6789",
+    "status": "신청",
+    "created_at": "2026-06-26T18:45:44.530135+00:00"
+  },
+  {
+    "id": 3,
+    "experience_id": 8,
+    "user_name": "박지윤",
+    "contact": "010-3456-7890",
+    "status": "신청",
+    "created_at": "2026-06-27T13:45:44.530135+00:00"
+  },
+  {
+    "id": 4,
+    "experience_id": 1,
+    "user_name": "최도현",
+    "contact": "010-4567-8901",
+    "status": "확정",
+    "created_at": "2026-06-22T18:45:44.530135+00:00"
+  },
+  {
+    "id": 5,
+    "experience_id": 15,
+    "user_name": "정하은",
+    "contact": "010-5678-9012",
+    "status": "취소",
+    "created_at": "2026-06-25T18:45:44.530135+00:00"
+  }
+]
