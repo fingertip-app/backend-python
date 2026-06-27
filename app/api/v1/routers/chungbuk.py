@@ -21,6 +21,7 @@ ARTISANS_FILE = "chungbuk_artisans.json"
 EXPERIENCES_FILE = "chungbuk_experiences.json"
 CARD_NEWS_FILE = "chungbuk_card_news.json"
 RESERVATIONS_FILE = "chungbuk_reservations.json"
+TOURIST_SPOTS_FILE = "chungbuk_tourist_spots.json"
 
 
 # ---------- 장인 ----------
@@ -137,6 +138,36 @@ def recommend_chungbuk_experiences(
     """
     service = service_factory()
     return service.recommend(payload.query, payload.top_k)
+
+
+# ---------- 주변 관광지 추천 ----------
+
+
+class ChungbukTouristSpotResponse(BaseModel):
+    id: int
+    category: str
+    region: str = "충북"
+    sigun: str | None = None
+    name: str
+    address: str | None = None
+    established_year: str | None = None
+    open_cycle: str | None = None
+    market_day: str | None = None
+    note: str | None = None
+
+
+@router.get("/tourist-spots", response_model=list[ChungbukTouristSpotResponse])
+def list_chungbuk_tourist_spots(sigun: str | None = None) -> list[dict]:
+    """
+    체험 상세의 "주변 관광지 추천" 영역용 데이터.
+    충북나드리 API는 접근 권한이 없어 한국관광공사 전통시장 Open API로 대체했다
+    (scripts/fetch_chungbuk_tradimarket.py로 수집).
+    sigun 쿼리파라미터로 특정 시군 주변만 필터링할 수 있다.
+    """
+    spots = read_json(TOURIST_SPOTS_FILE, default=[])
+    if sigun:
+        spots = [s for s in spots if s.get("sigun") == sigun]
+    return spots
 
 
 # ---------- 카드뉴스 ----------
