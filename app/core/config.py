@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     internal_api_key: str = ""
     ai_fallback_enabled: bool = False
     ai_fallback_data_path: str = "app/data/ai_fallback_responses.json"
+    chungbuk_cors_origins: str = ""
 
 
 settings = Settings()
