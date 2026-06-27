@@ -8,6 +8,7 @@
 """
 
 import logging
+import secrets
 
 import jwt
 from fastapi import Header, HTTPException, status
@@ -15,6 +16,17 @@ from fastapi import Header, HTTPException, status
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
+
+
+def verify_chungbuk_admin_key(x_admin_key: str | None = Header(None)) -> None:
+    """장인 인증(certify) 같은 관리자 전용 작업 보호. X-Admin-Key 헤더 검증."""
+    if not settings.chungbuk_admin_key:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Admin key is not configured",
+        )
+    if not x_admin_key or not secrets.compare_digest(x_admin_key, settings.chungbuk_admin_key):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid admin key")
 
 
 def _decode(token: str) -> dict:

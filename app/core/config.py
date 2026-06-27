@@ -48,6 +48,8 @@ class Settings(BaseSettings):
     # 일반 사용자 "내 예약 목록"용. 손끝과 같은 Supabase 프로젝트의 JWT secret(Auth는 공유하기로 했음).
     # 비워두면 로그인 사용자 식별 기능(내 예약 목록)만 비활성화되고 나머지는 그대로 동작한다.
     supabase_jwt_secret: str = ""
+    # 장인 인증(certify) 같은 관리자 전용 작업 보호용 고정 키.
+    chungbuk_admin_key: str = ""
 
 
 settings = Settings()

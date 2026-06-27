@@ -8,7 +8,10 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 
 from app.schemas.ai import ExplainResponse
-from app.services.chungbuk.auth import get_optional_supabase_user_id, require_supabase_user_id
+from app.services.chungbuk.auth import (
+    require_supabase_user_id,
+    verify_chungbuk_admin_key,
+)
 from app.services.chungbuk.data_store import next_id, read_json, write_json
 from app.services.chungbuk.experience_recommend import (
     ChungbukExperienceRecommendService,
@@ -83,7 +86,7 @@ def register_chungbuk_artisan(payload: ChungbukArtisanCreateRequest) -> dict:
 
 
 @router.patch("/artisans/{artisan_id}/certify", response_model=ChungbukArtisanResponse)
-def certify_chungbuk_artisan(artisan_id: int) -> dict:
+def certify_chungbuk_artisan(artisan_id: int, _: None = Depends(verify_chungbuk_admin_key)) -> dict:
     """관리자가 충북 시도무형유산 보유자 현황을 직접 대조해 확인한 뒤 인증 처리"""
     artisans = read_json(ARTISANS_FILE)
     for artisan in artisans:
@@ -226,12 +229,12 @@ class ChungbukReservationResponse(BaseModel):
 )
 def create_chungbuk_reservation(
     payload: ChungbukReservationCreateRequest,
-    user_id: str | None = Depends(get_optional_supabase_user_id),
+    user_id: str = Depends(require_supabase_user_id),
 ) -> dict:
     """
     체험 예약 신청 (데모용 - 결제/일정 관리 없이 신청 상태만 기록).
-    로그인 없이도 예약 가능하지만, Authorization 헤더에 유효한 Supabase JWT가 있으면
-    user_id를 같이 저장해서 나중에 "내 예약 목록"(GET /reservations/mine)에서 조회할 수 있다.
+    로그인 필수 - Authorization 헤더에 유효한 Supabase JWT가 있어야 예약 가능하고,
+    그 user_id로 "내 예약 목록"(GET /reservations/mine)에서 조회할 수 있다.
     """
     experiences = read_json(EXPERIENCES_FILE)
     if not any(e["id"] == payload.experience_id for e in experiences):
