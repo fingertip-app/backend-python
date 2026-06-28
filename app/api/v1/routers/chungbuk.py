@@ -158,6 +158,63 @@ def create_chungbuk_experience(
     return experience
 
 
+def _find_experience(experiences: list[dict], experience_id: int) -> dict:
+    for experience in experiences:
+        if experience["id"] == experience_id:
+            return experience
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
+
+
+@router.patch(
+    "/artisans/{artisan_id}/experiences/{experience_id}",
+    response_model=ChungbukExperienceResponse,
+)
+def update_chungbuk_experience(
+    artisan_id: int,
+    experience_id: int,
+    token: str,
+    payload: ChungbukExperienceCreateRequest,
+) -> dict:
+    """장인이 본인 체험을 수정한다. 장인 토큰으로 보호하며 본인 소유 체험만 수정 가능."""
+    _verify_artisan_token(artisan_id, token)
+
+    experiences = read_json(EXPERIENCES_FILE)
+    experience = _find_experience(experiences, experience_id)
+    if experience.get("artisan_id") != artisan_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your experience")
+
+    experience.update(
+        {
+            "title": payload.title,
+            "description": payload.description,
+            "price": payload.price,
+            "duration_minutes": payload.duration_minutes,
+            "max_participants": payload.max_participants,
+            "image_url": payload.image_url,
+            "location": payload.location,
+        }
+    )
+    write_json(EXPERIENCES_FILE, experiences)
+    return experience
+
+
+@router.delete(
+    "/artisans/{artisan_id}/experiences/{experience_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_chungbuk_experience(artisan_id: int, experience_id: int, token: str) -> None:
+    """장인이 본인 체험을 삭제한다. 장인 토큰으로 보호하며 본인 소유 체험만 삭제 가능."""
+    _verify_artisan_token(artisan_id, token)
+
+    experiences = read_json(EXPERIENCES_FILE)
+    experience = _find_experience(experiences, experience_id)
+    if experience.get("artisan_id") != artisan_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your experience")
+
+    experiences = [e for e in experiences if e["id"] != experience_id]
+    write_json(EXPERIENCES_FILE, experiences)
+
+
 class ChungbukExperienceRecommendItem(ChungbukExperienceResponse):
     similarity: float
 
@@ -261,6 +318,7 @@ class ChungbukReservationResponse(BaseModel):
     status: str
     created_at: str
     user_id: str | None = None
+    payment_key: str | None = None
 
 
 @router.post(
@@ -384,6 +442,31 @@ def cancel_chungbuk_reservation(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your reservation")
 
     reservation["status"] = "취소"
+    write_json(RESERVATIONS_FILE, reservations)
+    return reservation
+
+
+@router.patch("/reservations/{reservation_id}/pay", response_model=ChungbukReservationResponse)
+def pay_chungbuk_reservation(
+    reservation_id: int, user_id: str = Depends(require_supabase_user_id)
+) -> dict:
+    """
+    예약 결제 (데모용 - 실제 PG 연동 없이 결제 완료 상태만 기록).
+    예약을 신청한 본인만 결제할 수 있고, 확정(승인)된 예약만 결제 가능하다.
+    결제 완료 시 발급되는 payment_key를 QR 확인서 생성에 사용한다.
+    """
+    reservations = read_json(RESERVATIONS_FILE, default=[])
+    reservation = _find_reservation(reservations, reservation_id)
+    if reservation.get("user_id") != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your reservation")
+    if reservation["status"] not in ("신청", "확정"):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Cannot pay a reservation with status '{reservation['status']}'",
+        )
+
+    reservation["status"] = "결제완료"
+    reservation["payment_key"] = secrets.token_urlsafe(16)
     write_json(RESERVATIONS_FILE, reservations)
     return reservation
 
