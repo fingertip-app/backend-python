@@ -309,6 +309,7 @@ class ChungbukReservationCreateRequest(BaseModel):
     experience_id: int
     user_name: str = Field(min_length=1, max_length=100)
     contact: str = Field(min_length=1, max_length=100)
+    num_participants: int = Field(default=1, ge=1, le=100)
 
 
 class ChungbukReservationResponse(BaseModel):
@@ -316,6 +317,7 @@ class ChungbukReservationResponse(BaseModel):
     experience_id: int
     user_name: str
     contact: str
+    num_participants: int = 1
     status: str
     created_at: str
     user_id: str | None = None
@@ -344,6 +346,7 @@ def create_chungbuk_reservation(
         "experience_id": payload.experience_id,
         "user_name": payload.user_name,
         "contact": payload.contact,
+        "num_participants": payload.num_participants,
         "status": "신청",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "user_id": user_id,
