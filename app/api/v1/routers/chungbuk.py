@@ -388,6 +388,147 @@ def cancel_chungbuk_reservation(
     return reservation
 
 
+# ---------- 리뷰 ----------
+
+REVIEWS_FILE = "chungbuk_reviews.json"
+
+
+class ChungbukReviewCreateRequest(BaseModel):
+    experience_id: int
+    rating: int = Field(ge=1, le=5)
+    content: str = Field(default="", max_length=2000)
+
+
+class ChungbukReviewResponse(BaseModel):
+    id: int
+    experience_id: int
+    user_id: str
+    rating: int
+    content: str
+    created_at: str
+
+
+@router.post("/reviews", response_model=ChungbukReviewResponse, status_code=status.HTTP_201_CREATED)
+def create_chungbuk_review(
+    payload: ChungbukReviewCreateRequest,
+    user_id: str = Depends(require_supabase_user_id),
+) -> dict:
+    """체험 리뷰 작성. 로그인 필수."""
+    experiences = read_json(EXPERIENCES_FILE)
+    if not any(e["id"] == payload.experience_id for e in experiences):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
+
+    reviews = read_json(REVIEWS_FILE, default=[])
+    review = {
+        "id": next_id(reviews),
+        "experience_id": payload.experience_id,
+        "user_id": user_id,
+        "rating": payload.rating,
+        "content": payload.content,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    reviews.append(review)
+    write_json(REVIEWS_FILE, reviews)
+    return review
+
+
+@router.get("/reviews/experience/{experience_id}", response_model=list[ChungbukReviewResponse])
+def list_chungbuk_experience_reviews(experience_id: int) -> list[dict]:
+    """체험별 리뷰 목록 (공개, 로그인 불필요)."""
+    reviews = read_json(REVIEWS_FILE, default=[])
+    return [r for r in reviews if r.get("experience_id") == experience_id]
+
+
+@router.get("/reviews/mine", response_model=list[ChungbukReviewResponse])
+def list_my_chungbuk_reviews(user_id: str = Depends(require_supabase_user_id)) -> list[dict]:
+    """로그인한 사용자 본인이 작성한 리뷰 목록 (중복 작성 여부 확인용)."""
+    reviews = read_json(REVIEWS_FILE, default=[])
+    return [r for r in reviews if r.get("user_id") == user_id]
+
+
+# ---------- 찜(위시리스트) ----------
+
+WISHLISTS_FILE = "chungbuk_wishlists.json"
+
+
+class ChungbukWishlistResponse(BaseModel):
+    id: int
+    experience_id: int
+    user_id: str
+    created_at: str
+
+
+@router.get("/wishlists", response_model=list[ChungbukWishlistResponse])
+def list_my_chungbuk_wishlists(user_id: str = Depends(require_supabase_user_id)) -> list[dict]:
+    """로그인한 사용자의 찜 목록."""
+    wishlists = read_json(WISHLISTS_FILE, default=[])
+    return [w for w in wishlists if w.get("user_id") == user_id]
+
+
+@router.get("/wishlists/check/{experience_id}")
+def check_chungbuk_wishlist(
+    experience_id: int, user_id: str = Depends(require_supabase_user_id)
+) -> dict:
+    """특정 체험이 내 찜 목록에 있는지 확인."""
+    wishlists = read_json(WISHLISTS_FILE, default=[])
+    is_in_wishlist = any(
+        w.get("user_id") == user_id and w.get("experience_id") == experience_id for w in wishlists
+    )
+    return {"isInWishlist": is_in_wishlist}
+
+
+@router.post(
+    "/wishlists/{experience_id}",
+    response_model=ChungbukWishlistResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_chungbuk_wishlist(
+    experience_id: int, user_id: str = Depends(require_supabase_user_id)
+) -> dict:
+    """체험을 찜 목록에 추가."""
+    experiences = read_json(EXPERIENCES_FILE)
+    if not any(e["id"] == experience_id for e in experiences):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
+
+    wishlists = read_json(WISHLISTS_FILE, default=[])
+    existing = next(
+        (
+            w
+            for w in wishlists
+            if w.get("user_id") == user_id and w.get("experience_id") == experience_id
+        ),
+        None,
+    )
+    if existing:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Already in wishlist")
+
+    wishlist = {
+        "id": next_id(wishlists),
+        "experience_id": experience_id,
+        "user_id": user_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    wishlists.append(wishlist)
+    write_json(WISHLISTS_FILE, wishlists)
+    return wishlist
+
+
+@router.delete("/wishlists/{experience_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_chungbuk_wishlist(
+    experience_id: int, user_id: str = Depends(require_supabase_user_id)
+) -> None:
+    """체험을 찜 목록에서 제거."""
+    wishlists = read_json(WISHLISTS_FILE, default=[])
+    remaining = [
+        w
+        for w in wishlists
+        if not (w.get("user_id") == user_id and w.get("experience_id") == experience_id)
+    ]
+    if len(remaining) == len(wishlists):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not in wishlist")
+    write_json(WISHLISTS_FILE, remaining)
+
+
 # ---------- KPI ----------
 
 
