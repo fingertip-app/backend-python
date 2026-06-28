@@ -288,6 +288,67 @@ def list_artisan_reservations(artisan_id: int, token: str) -> list[dict]:
     return [r for r in reservations if r["experience_id"] in my_experience_ids]
 
 
+def _find_reservation(reservations: list[dict], reservation_id: int) -> dict:
+    for reservation in reservations:
+        if reservation["id"] == reservation_id:
+            return reservation
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reservation not found")
+
+
+def _assert_artisan_owns_reservation(artisan_id: int, reservation: dict) -> None:
+    experiences = read_json(EXPERIENCES_FILE)
+    my_experience_ids = {e["id"] for e in experiences if e.get("artisan_id") == artisan_id}
+    if reservation["experience_id"] not in my_experience_ids:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your reservation")
+
+
+@router.patch(
+    "/artisans/{artisan_id}/reservations/{reservation_id}/approve",
+    response_model=ChungbukReservationResponse,
+)
+def approve_chungbuk_reservation(artisan_id: int, reservation_id: int, token: str) -> dict:
+    """장인이 본인 체험에 들어온 예약 신청을 승인(확정)한다."""
+    _verify_artisan_token(artisan_id, token)
+    reservations = read_json(RESERVATIONS_FILE, default=[])
+    reservation = _find_reservation(reservations, reservation_id)
+    _assert_artisan_owns_reservation(artisan_id, reservation)
+
+    reservation["status"] = "확정"
+    write_json(RESERVATIONS_FILE, reservations)
+    return reservation
+
+
+@router.patch(
+    "/artisans/{artisan_id}/reservations/{reservation_id}/reject",
+    response_model=ChungbukReservationResponse,
+)
+def reject_chungbuk_reservation(artisan_id: int, reservation_id: int, token: str) -> dict:
+    """장인이 본인 체험에 들어온 예약 신청을 거절한다."""
+    _verify_artisan_token(artisan_id, token)
+    reservations = read_json(RESERVATIONS_FILE, default=[])
+    reservation = _find_reservation(reservations, reservation_id)
+    _assert_artisan_owns_reservation(artisan_id, reservation)
+
+    reservation["status"] = "거절"
+    write_json(RESERVATIONS_FILE, reservations)
+    return reservation
+
+
+@router.patch("/reservations/{reservation_id}/cancel", response_model=ChungbukReservationResponse)
+def cancel_chungbuk_reservation(
+    reservation_id: int, user_id: str = Depends(require_supabase_user_id)
+) -> dict:
+    """예약을 신청한 본인이 취소한다. 다른 사람의 예약은 취소할 수 없다."""
+    reservations = read_json(RESERVATIONS_FILE, default=[])
+    reservation = _find_reservation(reservations, reservation_id)
+    if reservation.get("user_id") != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your reservation")
+
+    reservation["status"] = "취소"
+    write_json(RESERVATIONS_FILE, reservations)
+    return reservation
+
+
 # ---------- KPI ----------
 
 
