@@ -38,5 +38,32 @@
     "contact": "010-5678-9012",
     "status": "취소",
     "created_at": "2026-06-25T18:45:44.530135+00:00"
+  },
+  {
+    "id": 6,
+    "experience_id": 1,
+    "user_name": "김민준",
+    "contact": "010-1111-2222",
+    "status": "완료",
+    "created_at": "2026-06-16T13:36:06.561572+00:00",
+    "user_id": "seed-user-1"
+  },
+  {
+    "id": 7,
+    "experience_id": 1,
+    "user_name": "이서연",
+    "contact": "010-3333-4444",
+    "status": "완료",
+    "created_at": "2026-06-20T13:36:06.561572+00:00",
+    "user_id": "seed-user-2"
+  },
+  {
+    "id": 8,
+    "experience_id": 1,
+    "user_name": "박도윤",
+    "contact": "010-5555-6666",
+    "status": "완료",
+    "created_at": "2026-06-25T13:36:06.561572+00:00",
+    "user_id": "seed-user-3"
   }
 ]

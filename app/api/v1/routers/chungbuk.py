@@ -316,7 +316,7 @@ class ChungbukReservationCreateRequest(BaseModel):
     experience_id: int
     user_name: str = Field(min_length=1, max_length=100)
     contact: str = Field(min_length=1, max_length=100)
-    participant_count: int = Field(default=1, ge=1)
+    num_participants: int = Field(default=1, ge=1, le=100)
 
 
 class ChungbukReservationResponse(BaseModel):
@@ -324,12 +324,12 @@ class ChungbukReservationResponse(BaseModel):
     experience_id: int
     user_name: str
     contact: str
+    num_participants: int = 1
+    total_price: int = 0
     status: str
     created_at: str
     user_id: str | None = None
     payment_key: str | None = None
-    participant_count: int = 1
-    total_price: int = 0
 
 
 @router.post(
@@ -355,11 +355,11 @@ def create_chungbuk_reservation(
         "experience_id": payload.experience_id,
         "user_name": payload.user_name,
         "contact": payload.contact,
+        "num_participants": payload.num_participants,
+        "total_price": int(experience.get("price", 0)) * payload.num_participants,
         "status": "신청",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "user_id": user_id,
-        "participant_count": payload.participant_count,
-        "total_price": experience.get("price", 0) * payload.participant_count,
     }
     reservations.append(reservation)
     write_json(RESERVATIONS_FILE, reservations)
