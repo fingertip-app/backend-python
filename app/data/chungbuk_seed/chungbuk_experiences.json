@@ -9,7 +9,12 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/1.png",
-    "location": "충청북도"
+    "location": "충청북도",
+    "supported_languages": [
+      "ko",
+      "en",
+      "ja"
+    ]
   },
   {
     "id": 2,
@@ -21,7 +26,10 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/2.png",
-    "location": "충청북도"
+    "location": "충청북도",
+    "supported_languages": [
+      "ko"
+    ]
   },
   {
     "id": 3,
@@ -33,7 +41,12 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/3.png",
-    "location": "충청북도"
+    "location": "충청북도",
+    "supported_languages": [
+      "ko",
+      "en",
+      "ja"
+    ]
   },
   {
     "id": 4,
@@ -45,7 +58,10 @@
     "duration_minutes": 60,
     "max_participants": 10,
     "image_url": "/static/experiences/4.png",
-    "location": "충청북도 충주시"
+    "location": "충청북도 충주시",
+    "supported_languages": [
+      "ko"
+    ]
   },
   {
     "id": 5,
@@ -57,7 +73,10 @@
     "duration_minutes": 60,
     "max_participants": 10,
     "image_url": "/static/experiences/5.png",
-    "location": "충북 보은군 속리산면 삼가구병길 180-9 (구병리)"
+    "location": "충북 보은군 속리산면 삼가구병길 180-9 (구병리)",
+    "supported_languages": [
+      "ko"
+    ]
   },
   {
     "id": 6,
@@ -69,7 +88,10 @@
     "duration_minutes": 60,
     "max_participants": 10,
     "image_url": "/static/experiences/6.png",
-    "location": "충청북도 청주시 상당구 것대로 5 (산성동, 청주신선주)"
+    "location": "충청북도 청주시 상당구 것대로 5 (산성동, 청주신선주)",
+    "supported_languages": [
+      "ko"
+    ]
   },
   {
     "id": 7,
@@ -81,7 +103,10 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/7.png",
-    "location": "충청북도 청주시"
+    "location": "충청북도 청주시",
+    "supported_languages": [
+      "ko"
+    ]
   },
   {
     "id": 8,
@@ -93,7 +118,12 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/8.png",
-    "location": "충청북도 충주시"
+    "location": "충청북도 충주시",
+    "supported_languages": [
+      "ko",
+      "en",
+      "ja"
+    ]
   },
   {
     "id": 9,
@@ -105,7 +135,10 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/9.png",
-    "location": "충청북도 충주시"
+    "location": "충청북도 충주시",
+    "supported_languages": [
+      "ko"
+    ]
   },
   {
     "id": 10,
@@ -117,7 +150,12 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/10.png",
-    "location": "충청북도 청주시"
+    "location": "충청북도 청주시",
+    "supported_languages": [
+      "ko",
+      "en",
+      "ja"
+    ]
   },
   {
     "id": 11,
@@ -129,7 +167,10 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/11.png",
-    "location": "충청북도 청주시"
+    "location": "충청북도 청주시",
+    "supported_languages": [
+      "ko"
+    ]
   },
   {
     "id": 12,
@@ -141,7 +182,12 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/12.png",
-    "location": "충청북도"
+    "location": "충청북도",
+    "supported_languages": [
+      "ko",
+      "en",
+      "ja"
+    ]
   },
   {
     "id": 13,
@@ -153,7 +199,10 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/13.png",
-    "location": "충청북도 단양군"
+    "location": "충청북도 단양군",
+    "supported_languages": [
+      "ko"
+    ]
   },
   {
     "id": 14,
@@ -165,7 +214,10 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/14.png",
-    "location": "충청북도 영동군"
+    "location": "충청북도 영동군",
+    "supported_languages": [
+      "ko"
+    ]
   },
   {
     "id": 15,
@@ -177,7 +229,12 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/15.png",
-    "location": "충청북도 보은군"
+    "location": "충청북도 보은군",
+    "supported_languages": [
+      "ko",
+      "en",
+      "ja"
+    ]
   },
   {
     "id": 16,
@@ -189,7 +246,10 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/16.png",
-    "location": "충청북도 청주시"
+    "location": "충청북도 청주시",
+    "supported_languages": [
+      "ko"
+    ]
   },
   {
     "id": 17,
@@ -201,7 +261,12 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/17.png",
-    "location": "충청북도 충주시"
+    "location": "충청북도 충주시",
+    "supported_languages": [
+      "ko",
+      "en",
+      "ja"
+    ]
   },
   {
     "id": 18,
@@ -213,7 +278,10 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/18.png",
-    "location": "충청북도 청주시"
+    "location": "충청북도 청주시",
+    "supported_languages": [
+      "ko"
+    ]
   },
   {
     "id": 19,
@@ -225,7 +293,12 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/19.png",
-    "location": "충청북도 보은군"
+    "location": "충청북도 보은군",
+    "supported_languages": [
+      "ko",
+      "en",
+      "ja"
+    ]
   },
   {
     "id": 20,
@@ -237,6 +310,9 @@
     "duration_minutes": 100,
     "max_participants": 6,
     "image_url": "/static/experiences/20.png",
-    "location": "충청북도 증평군"
+    "location": "충청북도 증평군",
+    "supported_languages": [
+      "ko"
+    ]
   }
 ]

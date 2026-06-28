@@ -111,6 +111,7 @@ class ChungbukExperienceResponse(BaseModel):
     max_participants: int
     image_url: str | None = None
     location: str | None = None
+    supported_languages: list[str] = Field(default_factory=lambda: ["ko"])
 
 
 class ChungbukExperienceCreateRequest(BaseModel):
