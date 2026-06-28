@@ -24,6 +24,10 @@ logger = logging.getLogger(__name__)
 
 HERITAGE_FILE = "chungbuk_heritage.json"
 
+# 충북 헤리티지 설명이 짧은 행정 텍스트라 유사도가 전반적으로 낮다(0.2~0.3대).
+# 전역 rag_similarity_threshold(0.20)는 손끝 RAG와 공유되므로 건드리지 않고, 충북 전용으로 낮게 둔다.
+CHUNGBUK_SIMILARITY_THRESHOLD = 0.15
+
 # 같은 프로세스 내에서 동시 요청이 임베딩 로드를 중복 실행하지 않도록 막는 락
 _embedding_load_lock = threading.Lock()
 
@@ -168,7 +172,7 @@ class ChungbukRagService:
 
         similarities = self._embedding_matrix @ query_embedding
         top_indices = np.argsort(-similarities)[:top_k]
-        threshold = settings.rag_similarity_threshold
+        threshold = CHUNGBUK_SIMILARITY_THRESHOLD
         return [
             self._embedded_chunks[i]
             for i in top_indices

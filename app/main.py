@@ -2,10 +2,13 @@ from contextlib import asynccontextmanager
 import logging
 import uuid
 
+from pathlib import Path
+
 from fastapi import Depends, FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -48,13 +51,23 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 
-if settings.chungbuk_cors_origins:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[origin.strip() for origin in settings.chungbuk_cors_origins.split(",")],
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+_cors_origins = [
+    origin.strip() for origin in settings.chungbuk_cors_origins.split(",") if origin.strip()
+]
+# 운영 도메인은 화이트리스트로, 로컬 개발(localhost/127.0.0.1 모든 포트)은 정규식으로 허용한다.
+# Expo 개발 서버 포트가 매번 바뀌어도 CORS 막힘 없이 테스트할 수 있게 한다.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_cors_origins,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# 충북 정적 이미지 서빙 (체험/장인/카드뉴스 사진). 코드와 함께 배포되는 읽기 전용 에셋.
+_static_dir = Path(__file__).resolve().parent / "static"
+_static_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
 
 app.include_router(api_router, prefix="/api/v1")
 
