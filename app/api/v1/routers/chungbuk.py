@@ -113,10 +113,49 @@ class ChungbukExperienceResponse(BaseModel):
     location: str | None = None
 
 
+class ChungbukExperienceCreateRequest(BaseModel):
+    title: str = Field(min_length=1, max_length=255)
+    description: str = ""
+    price: int = Field(default=0, ge=0)
+    duration_minutes: int = Field(default=60, ge=0)
+    max_participants: int = Field(default=1, ge=1)
+    image_url: str | None = None
+    location: str | None = None
+
+
 @router.get("/experiences", response_model=list[ChungbukExperienceResponse])
 def list_chungbuk_experiences() -> list[dict]:
     """충북 체험 프로그램 목록"""
     return read_json(EXPERIENCES_FILE)
+
+
+@router.post(
+    "/artisans/{artisan_id}/experiences",
+    response_model=ChungbukExperienceResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_chungbuk_experience(
+    artisan_id: int, token: str, payload: ChungbukExperienceCreateRequest
+) -> dict:
+    """장인이 본인 체험을 등록한다. 장인 토큰으로 보호하며 artisan_id에 귀속시킨다."""
+    _verify_artisan_token(artisan_id, token)
+
+    experiences = read_json(EXPERIENCES_FILE)
+    experience = {
+        "id": next_id(experiences),
+        "title": payload.title,
+        "description": payload.description,
+        "artisan_id": artisan_id,
+        "region": "충북",
+        "price": payload.price,
+        "duration_minutes": payload.duration_minutes,
+        "max_participants": payload.max_participants,
+        "image_url": payload.image_url,
+        "location": payload.location,
+    }
+    experiences.append(experience)
+    write_json(EXPERIENCES_FILE, experiences)
+    return experience
 
 
 class ChungbukExperienceRecommendItem(ChungbukExperienceResponse):
