@@ -3,47 +3,59 @@
     "id": 1,
     "experience_id": 1,
     "user_name": "김민지",
-    "contact": "010-1234-5678",
+    "contact": "010-2841-5573",
+    "num_participants": 2,
+    "total_price": 70000,
     "status": "확정",
-    "created_at": "2026-06-24T18:45:44.530135+00:00"
+    "created_at": "2026-06-24T05:00:00+00:00"
   },
   {
     "id": 2,
     "experience_id": 4,
     "user_name": "이서준",
     "contact": "010-2345-6789",
+    "num_participants": 2,
+    "total_price": 50000,
     "status": "신청",
-    "created_at": "2026-06-26T18:45:44.530135+00:00"
+    "created_at": "2026-06-26T05:00:00+00:00"
   },
   {
     "id": 3,
     "experience_id": 8,
     "user_name": "박지윤",
     "contact": "010-3456-7890",
+    "num_participants": 2,
+    "total_price": 70000,
     "status": "신청",
-    "created_at": "2026-06-27T13:45:44.530135+00:00"
+    "created_at": "2026-06-27T02:00:00+00:00"
   },
   {
     "id": 4,
     "experience_id": 1,
     "user_name": "최도현",
-    "contact": "010-4567-8901",
+    "contact": "010-3372-1198",
+    "num_participants": 1,
+    "total_price": 35000,
     "status": "확정",
-    "created_at": "2026-06-22T18:45:44.530135+00:00"
+    "created_at": "2026-06-22T02:00:00+00:00"
   },
   {
     "id": 5,
     "experience_id": 15,
     "user_name": "정하은",
     "contact": "010-5678-9012",
+    "num_participants": 1,
+    "total_price": 35000,
     "status": "취소",
-    "created_at": "2026-06-25T18:45:44.530135+00:00"
+    "created_at": "2026-06-25T07:00:00+00:00"
   },
   {
     "id": 6,
     "experience_id": 1,
     "user_name": "김민준",
     "contact": "010-1111-2222",
+    "num_participants": 2,
+    "total_price": 70000,
     "status": "완료",
     "created_at": "2026-06-16T13:36:06.561572+00:00",
     "user_id": "seed-user-1"
@@ -53,6 +65,8 @@
     "experience_id": 1,
     "user_name": "이서연",
     "contact": "010-3333-4444",
+    "num_participants": 3,
+    "total_price": 105000,
     "status": "완료",
     "created_at": "2026-06-20T13:36:06.561572+00:00",
     "user_id": "seed-user-2"
@@ -62,8 +76,80 @@
     "experience_id": 1,
     "user_name": "박도윤",
     "contact": "010-5555-6666",
+    "num_participants": 2,
+    "total_price": 70000,
     "status": "완료",
     "created_at": "2026-06-25T13:36:06.561572+00:00",
     "user_id": "seed-user-3"
+  },
+  {
+    "id": 9,
+    "experience_id": 1,
+    "user_name": "한지우",
+    "contact": "010-4729-3061",
+    "num_participants": 3,
+    "total_price": 105000,
+    "status": "신청",
+    "created_at": "2026-06-27T07:00:00+00:00"
+  },
+  {
+    "id": 10,
+    "experience_id": 1,
+    "user_name": "오서윤",
+    "contact": "010-6810-2245",
+    "num_participants": 2,
+    "total_price": 70000,
+    "status": "신청",
+    "created_at": "2026-06-28T01:30:00+00:00"
+  },
+  {
+    "id": 11,
+    "experience_id": 1,
+    "user_name": "강민서",
+    "contact": "010-5093-7782",
+    "num_participants": 4,
+    "total_price": 140000,
+    "status": "신청",
+    "created_at": "2026-06-28T04:00:00+00:00"
+  },
+  {
+    "id": 12,
+    "experience_id": 1,
+    "user_name": "윤다은",
+    "contact": "010-2257-9914",
+    "num_participants": 1,
+    "total_price": 35000,
+    "status": "취소",
+    "created_at": "2026-06-19T06:00:00+00:00"
+  },
+  {
+    "id": 13,
+    "experience_id": 1,
+    "user_name": "임준혁",
+    "contact": "010-8146-3370",
+    "num_participants": 2,
+    "total_price": 70000,
+    "status": "거절",
+    "created_at": "2026-06-17T08:00:00+00:00"
+  },
+  {
+    "id": 14,
+    "experience_id": 2,
+    "user_name": "송하준",
+    "contact": "010-7741-2208",
+    "num_participants": 2,
+    "total_price": 70000,
+    "status": "완료",
+    "created_at": "2026-06-15T01:00:00+00:00"
+  },
+  {
+    "id": 15,
+    "experience_id": 6,
+    "user_name": "배수아",
+    "contact": "010-3360-8857",
+    "num_participants": 3,
+    "total_price": 75000,
+    "status": "확정",
+    "created_at": "2026-06-26T06:00:00+00:00"
   }
 ]
