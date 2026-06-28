@@ -111,6 +111,8 @@ class ChungbukExperienceResponse(BaseModel):
     max_participants: int
     image_url: str | None = None
     location: str | None = None
+    supported_languages: list[str] = []
+    category: str | None = None
 
 
 class ChungbukExperienceCreateRequest(BaseModel):
@@ -121,6 +123,8 @@ class ChungbukExperienceCreateRequest(BaseModel):
     max_participants: int = Field(default=1, ge=1)
     image_url: str | None = None
     location: str | None = None
+    supported_languages: list[str] = []
+    category: str | None = None
 
 
 @router.get("/experiences", response_model=list[ChungbukExperienceResponse])
@@ -152,6 +156,8 @@ def create_chungbuk_experience(
         "max_participants": payload.max_participants,
         "image_url": payload.image_url,
         "location": payload.location,
+        "supported_languages": payload.supported_languages,
+        "category": payload.category,
     }
     experiences.append(experience)
     write_json(EXPERIENCES_FILE, experiences)
@@ -192,6 +198,8 @@ def update_chungbuk_experience(
             "max_participants": payload.max_participants,
             "image_url": payload.image_url,
             "location": payload.location,
+            "supported_languages": payload.supported_languages,
+            "category": payload.category,
         }
     )
     write_json(EXPERIENCES_FILE, experiences)
@@ -308,6 +316,7 @@ class ChungbukReservationCreateRequest(BaseModel):
     experience_id: int
     user_name: str = Field(min_length=1, max_length=100)
     contact: str = Field(min_length=1, max_length=100)
+    participant_count: int = Field(default=1, ge=1)
 
 
 class ChungbukReservationResponse(BaseModel):
@@ -319,6 +328,8 @@ class ChungbukReservationResponse(BaseModel):
     created_at: str
     user_id: str | None = None
     payment_key: str | None = None
+    participant_count: int = 1
+    total_price: int = 0
 
 
 @router.post(
@@ -334,7 +345,8 @@ def create_chungbuk_reservation(
     그 user_id로 "내 예약 목록"(GET /reservations/mine)에서 조회할 수 있다.
     """
     experiences = read_json(EXPERIENCES_FILE)
-    if not any(e["id"] == payload.experience_id for e in experiences):
+    experience = next((e for e in experiences if e["id"] == payload.experience_id), None)
+    if experience is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
 
     reservations = read_json(RESERVATIONS_FILE, default=[])
@@ -346,6 +358,8 @@ def create_chungbuk_reservation(
         "status": "신청",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "user_id": user_id,
+        "participant_count": payload.participant_count,
+        "total_price": experience.get("price", 0) * payload.participant_count,
     }
     reservations.append(reservation)
     write_json(RESERVATIONS_FILE, reservations)

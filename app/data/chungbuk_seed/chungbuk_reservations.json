@@ -38,5 +38,33 @@
     "contact": "010-5678-9012",
     "status": "취소",
     "created_at": "2026-06-25T18:45:44.530135+00:00"
+  },
+  {
+    "id": 6,
+    "experience_id": 1,
+    "user_name": "예약자",
+    "contact": "-",
+    "status": "결제완료",
+    "created_at": "2026-06-28T05:05:12.849340+00:00",
+    "user_id": "4e85eec1-5d6d-478d-a61c-2c37bf51c0dd",
+    "payment_key": "_1CFePsYoTA0VuaEam9SDA"
+  },
+  {
+    "id": 7,
+    "experience_id": 21,
+    "user_name": "예약자",
+    "contact": "-",
+    "status": "신청",
+    "created_at": "2026-06-28T13:21:22.636841+00:00",
+    "user_id": "4e85eec1-5d6d-478d-a61c-2c37bf51c0dd"
+  },
+  {
+    "id": 8,
+    "experience_id": 1,
+    "user_name": "예약자",
+    "contact": "-",
+    "status": "확정",
+    "created_at": "2026-06-28T13:26:20.827687+00:00",
+    "user_id": "4e85eec1-5d6d-478d-a61c-2c37bf51c0dd"
   }
 ]

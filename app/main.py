@@ -40,11 +40,17 @@ def _get_safe_body_preview(body_bytes: bytes) -> str:
 async def lifespan(app: FastAPI):
     configure_logging()
 
-    db = SessionLocal()
-    try:
-        CultureRagService.init_idf_cache(db)
-    finally:
-        db.close()
+    import os
+    if os.environ.get("SKIP_DB_INIT") != "1":
+        db = SessionLocal()
+        try:
+            CultureRagService.init_idf_cache(db)
+        finally:
+            db.close()
+    else:
+        logging.getLogger(__name__).warning(
+            "SKIP_DB_INIT=1 - CultureRagService.init_idf_cache 건너뜀 (로컬 테스트용)"
+        )
 
     yield
 

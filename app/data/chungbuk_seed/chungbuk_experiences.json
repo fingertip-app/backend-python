@@ -238,5 +238,21 @@
     "max_participants": 6,
     "image_url": "/static/experiences/20.png",
     "location": "충청북도 증평군"
+  },
+  {
+    "id": 21,
+    "title": "테스트",
+    "description": "ㅎㅎ\n\nㅎㅎ",
+    "artisan_id": 1,
+    "region": "충북",
+    "price": 10000,
+    "duration_minutes": 120,
+    "max_participants": 4,
+    "image_url": "http://localhost:8080/api/uploads/experience/34de0da2-31af-48ea-82f6-3a4dfa8148a3.jpeg",
+    "location": "서울",
+    "supported_languages": [
+      "한국어"
+    ],
+    "category": "도자기"
   }
 ]
