@@ -318,6 +318,7 @@ class ChungbukReservationResponse(BaseModel):
     user_name: str
     contact: str
     num_participants: int = 1
+    total_price: int = 0
     status: str
     created_at: str
     user_id: str | None = None
@@ -337,7 +338,8 @@ def create_chungbuk_reservation(
     그 user_id로 "내 예약 목록"(GET /reservations/mine)에서 조회할 수 있다.
     """
     experiences = read_json(EXPERIENCES_FILE)
-    if not any(e["id"] == payload.experience_id for e in experiences):
+    experience = next((e for e in experiences if e["id"] == payload.experience_id), None)
+    if experience is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
 
     reservations = read_json(RESERVATIONS_FILE, default=[])
@@ -347,6 +349,7 @@ def create_chungbuk_reservation(
         "user_name": payload.user_name,
         "contact": payload.contact,
         "num_participants": payload.num_participants,
+        "total_price": int(experience.get("price", 0)) * payload.num_participants,
         "status": "신청",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "user_id": user_id,
