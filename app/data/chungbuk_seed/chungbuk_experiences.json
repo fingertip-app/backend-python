@@ -8,7 +8,7 @@
     "price": 35000,
     "duration_minutes": 100,
     "max_participants": 6,
-    "image_url": "https://picsum.photos/seed/chungbuk-experience-1/800/600",
+    "image_url": "/static/experiences/1.png",
     "location": "충청북도"
   },
   {
@@ -20,7 +20,7 @@
     "price": 35000,
     "duration_minutes": 100,
     "max_participants": 6,
-    "image_url": "https://picsum.photos/seed/chungbuk-experience-2/800/600",
+    "image_url": "/static/experiences/2.png",
     "location": "충청북도"
   },
   {
@@ -32,7 +32,7 @@
     "price": 35000,
     "duration_minutes": 100,
     "max_participants": 6,
-    "image_url": "https://picsum.photos/seed/chungbuk-experience-3/800/600",
+    "image_url": "/static/experiences/3.png",
     "location": "충청북도"
   },
   {
@@ -44,7 +44,7 @@
     "price": 25000,
     "duration_minutes": 60,
     "max_participants": 10,
-    "image_url": "https://picsum.photos/seed/chungbuk-experience-4/800/600",
+    "image_url": "/static/experiences/4.png",
     "location": "충청북도 충주시"
   },
   {
@@ -56,7 +56,7 @@
     "price": 25000,
     "duration_minutes": 60,
     "max_participants": 10,
-    "image_url": "https://picsum.photos/seed/chungbuk-experience-5/800/600",
+    "image_url": "/static/experiences/5.png",
     "location": "충북 보은군 속리산면 삼가구병길 180-9 (구병리)"
   },
   {
@@ -68,7 +68,7 @@
     "price": 25000,
     "duration_minutes": 60,
     "max_participants": 10,
-    "image_url": "https://picsum.photos/seed/chungbuk-experience-6/800/600",
+    "image_url": "/static/experiences/6.png",
     "location": "충청북도 청주시 상당구 것대로 5 (산성동, 청주신선주)"
   },
   {
@@ -80,7 +80,7 @@
     "price": 35000,
     "duration_minutes": 100,
     "max_participants": 6,
-    "image_url": "https://picsum.photos/seed/chungbuk-experience-7/800/600",
+    "image_url": "/static/experiences/7.png",
     "location": "충청북도 청주시"
   },
   {
@@ -92,7 +92,7 @@
     "price": 35000,
     "duration_minutes": 100,
     "max_participants": 6,
-    "image_url": "https://picsum.photos/seed/chungbuk-experience-8/800/600",
+    "image_url": "/static/experiences/8.png",
     "location": "충청북도 충주시"
   },
   {
@@ -104,7 +104,7 @@
     "price": 35000,
     "duration_minutes": 100,
     "max_participants": 6,
-    "image_url": "https://picsum.photos/seed/chungbuk-experience-9/800/600",
+    "image_url": "/static/experiences/9.png",
     "location": "충청북도 충주시"
   },
   {
