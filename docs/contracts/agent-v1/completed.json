@@ -1,0 +1,27 @@
+{
+  "status": "completed",
+  "answer": "조건에 맞는 한지 체험을 확인했습니다.",
+  "recommendedExperienceIds": [
+    101
+  ],
+  "recommendations": [
+    {
+      "experienceId": 101,
+      "reason": "한지 만들기 체험",
+      "evidenceKeys": [
+        "experience:101:title"
+      ]
+    }
+  ],
+  "sources": [],
+  "appliedConstraints": {
+    "regionCode": "SEOUL",
+    "maxPriceKrw": "50000",
+    "headCount": 3
+  },
+  "unsupportedConstraints": [],
+  "limitations": [
+    "일정별 잔여 좌석은 확인하지 않았습니다."
+  ],
+  "requestId": "agent-demo-001"
+}

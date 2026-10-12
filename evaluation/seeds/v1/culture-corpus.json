@@ -1,0 +1,51 @@
+{
+  "provenance": {
+    "kind": "synthetic",
+    "createdOn": "2026-10-12",
+    "source": "Task 1 authored fixture; no live database or heritage API snapshot",
+    "humanReviewed": false,
+    "note": "합성 계약 검증 seed. 실제 문화유산 ID, 사람 검수 또는 측정된 AI 품질을 주장하지 않습니다."
+  },
+  "documents": [
+    {
+      "documentId": "synthetic:embroidery:001",
+      "heritageId": "synthetic-heritage:embroidery",
+      "title": "자수장",
+      "source": "synthetic://task-1/culture-corpus",
+      "category": "공예",
+      "contentExcerpt": "자수장은 바늘과 실로 무늬를 놓는 전통 기술과 관련된 종목이다."
+    },
+    {
+      "documentId": "synthetic:mosi:001",
+      "heritageId": "synthetic-heritage:mosi",
+      "title": "한산모시짜기",
+      "source": "synthetic://task-1/culture-corpus",
+      "category": "공예",
+      "contentExcerpt": "한산모시짜기는 모시 섬유로 옷감을 짜는 전통 기술과 관련된 종목이다."
+    },
+    {
+      "documentId": "synthetic:pansori:001",
+      "heritageId": "synthetic-heritage:pansori",
+      "title": "판소리",
+      "source": "synthetic://task-1/culture-corpus",
+      "category": "음악",
+      "contentExcerpt": "판소리는 소리꾼과 고수의 북 장단으로 이야기를 전하는 공연과 관련된 종목이다."
+    },
+    {
+      "documentId": "synthetic:knot:001",
+      "heritageId": "synthetic-heritage:knot",
+      "title": "매듭장",
+      "source": "synthetic://task-1/culture-corpus",
+      "category": "공예",
+      "contentExcerpt": "매듭장은 실이나 끈으로 장식 매듭을 만드는 전통 기술과 관련된 종목이다."
+    },
+    {
+      "documentId": "synthetic:pottery:001",
+      "heritageId": "synthetic-heritage:pottery",
+      "title": "사기장",
+      "source": "synthetic://task-1/culture-corpus",
+      "category": "공예",
+      "contentExcerpt": "사기장은 흙을 빚고 구워 도자기를 만드는 전통 기술과 관련된 종목이다."
+    }
+  ]
+}

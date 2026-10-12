@@ -1,0 +1,9 @@
+{
+  "query": "서울에서 부모님과 한지 체험을 하고 싶어요. 1인당 5만원 이하로요",
+  "locale": "ko",
+  "constraints": {
+    "regionCode": "SEOUL",
+    "maxPriceKrw": "50000",
+    "headCount": 3
+  }
+}

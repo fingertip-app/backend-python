@@ -1,0 +1,80 @@
+{
+  "$defs": {
+    "AgentConstraints": {
+      "additionalProperties": false,
+      "properties": {
+        "regionCode": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RegionCode"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "maxPriceKrw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maxpricekrw"
+        },
+        "headCount": {
+          "default": 1,
+          "maximum": 20,
+          "minimum": 1,
+          "title": "Headcount",
+          "type": "integer"
+        }
+      },
+      "title": "AgentConstraints",
+      "type": "object"
+    },
+    "RegionCode": {
+      "enum": [
+        "SEOUL",
+        "GYEONGGI",
+        "INCHEON",
+        "BUSAN",
+        "JEJU"
+      ],
+      "title": "RegionCode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "queryTerms": {
+      "items": {
+        "maxLength": 50,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 1,
+      "title": "Queryterms",
+      "type": "array"
+    },
+    "constraints": {
+      "$ref": "#/$defs/AgentConstraints"
+    },
+    "limit": {
+      "default": 5,
+      "maximum": 10,
+      "minimum": 1,
+      "title": "Limit",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "queryTerms"
+  ],
+  "title": "CatalogSearchRequest",
+  "type": "object"
+}

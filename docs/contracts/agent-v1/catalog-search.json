@@ -1,0 +1,11 @@
+{
+  "queryTerms": [
+    "한지"
+  ],
+  "constraints": {
+    "regionCode": "SEOUL",
+    "maxPriceKrw": "50000",
+    "headCount": 3
+  },
+  "limit": 5
+}

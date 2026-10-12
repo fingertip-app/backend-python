@@ -1,0 +1,168 @@
+{
+  "provenance": {
+    "kind": "synthetic",
+    "createdOn": "2026-10-12",
+    "source": "Task 1 authored fixture; no live database or heritage API snapshot",
+    "humanReviewed": false,
+    "note": "합성 계약 검증 seed. 실제 문화유산 ID, 사람 검수 또는 측정된 AI 품질을 주장하지 않습니다."
+  },
+  "items": [
+    {
+      "id": 101,
+      "title": "서울 한지 만들기",
+      "descriptionExcerpt": "한지 공예 체험",
+      "tags": [
+        "한지",
+        "가족"
+      ],
+      "priceKrw": "50000",
+      "maxParticipants": 3,
+      "regionCode": "SEOUL",
+      "isActive": true,
+      "address": "서울특별시 종로구"
+    },
+    {
+      "id": 102,
+      "title": "서울 한지 심화",
+      "descriptionExcerpt": "한지 공예 체험",
+      "tags": [
+        "한지"
+      ],
+      "priceKrw": "50000.01",
+      "maxParticipants": 4,
+      "regionCode": "SEOUL",
+      "isActive": true,
+      "address": "서울특별시 중구"
+    },
+    {
+      "id": 103,
+      "title": "서울 한지 소품",
+      "descriptionExcerpt": "한지 공예 체험",
+      "tags": [
+        "한지"
+      ],
+      "priceKrw": "49999.99",
+      "maxParticipants": 2,
+      "regionCode": "SEOUL",
+      "isActive": true,
+      "address": "서울특별시 성동구"
+    },
+    {
+      "id": 104,
+      "title": "경기 도자기 만들기",
+      "descriptionExcerpt": "도자기 공예 체험",
+      "tags": [
+        "도자기"
+      ],
+      "priceKrw": "40000",
+      "maxParticipants": 4,
+      "regionCode": "GYEONGGI",
+      "isActive": true,
+      "address": "경기도 수원시"
+    },
+    {
+      "id": 105,
+      "title": "부산 매듭 공예",
+      "descriptionExcerpt": "전통 매듭 체험",
+      "tags": [
+        "매듭"
+      ],
+      "priceKrw": "30000",
+      "maxParticipants": 3,
+      "regionCode": "BUSAN",
+      "isActive": true,
+      "address": "부산광역시 동구"
+    },
+    {
+      "id": 106,
+      "title": "서울 한지 종료 프로그램",
+      "descriptionExcerpt": "한지 공예 체험",
+      "tags": [
+        "한지"
+      ],
+      "priceKrw": "10000",
+      "maxParticipants": 4,
+      "regionCode": "SEOUL",
+      "isActive": false,
+      "address": "서울특별시 중구"
+    },
+    {
+      "id": 107,
+      "title": "주소 미등록 한지",
+      "descriptionExcerpt": "한지 공예 체험",
+      "tags": [
+        "한지"
+      ],
+      "priceKrw": "20000",
+      "maxParticipants": 4,
+      "regionCode": null,
+      "isActive": true,
+      "address": ""
+    },
+    {
+      "id": 108,
+      "title": "서울 무료 도자기",
+      "descriptionExcerpt": "도자기 공예 체험",
+      "tags": [
+        "도자기"
+      ],
+      "priceKrw": "0",
+      "maxParticipants": 2,
+      "regionCode": "SEOUL",
+      "isActive": true,
+      "address": "서울특별시 강남구"
+    },
+    {
+      "id": 109,
+      "title": "경기 매듭 공예",
+      "descriptionExcerpt": "전통 매듭 체험",
+      "tags": [
+        "매듭"
+      ],
+      "priceKrw": "50000",
+      "maxParticipants": 3,
+      "regionCode": "GYEONGGI",
+      "isActive": true,
+      "address": "경기도 성남시"
+    },
+    {
+      "id": 110,
+      "title": "부산 도자기 만들기",
+      "descriptionExcerpt": "도자기 공예 체험",
+      "tags": [
+        "도자기"
+      ],
+      "priceKrw": "50000.01",
+      "maxParticipants": 4,
+      "regionCode": "BUSAN",
+      "isActive": true,
+      "address": "부산광역시 북구"
+    },
+    {
+      "id": 111,
+      "title": "서울 매듭 소품",
+      "descriptionExcerpt": "전통 매듭 체험",
+      "tags": [
+        "매듭"
+      ],
+      "priceKrw": "49999.99",
+      "maxParticipants": 2,
+      "regionCode": "SEOUL",
+      "isActive": true,
+      "address": "서울특별시 은평구"
+    },
+    {
+      "id": 112,
+      "title": "부산 한지 종료 프로그램",
+      "descriptionExcerpt": "한지 공예 체험",
+      "tags": [
+        "한지"
+      ],
+      "priceKrw": "50000",
+      "maxParticipants": 3,
+      "regionCode": "BUSAN",
+      "isActive": false,
+      "address": "부산광역시 남구"
+    }
+  ]
+}

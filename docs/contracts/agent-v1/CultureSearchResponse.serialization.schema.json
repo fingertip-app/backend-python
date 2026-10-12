@@ -1,0 +1,71 @@
+{
+  "$defs": {
+    "CultureDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "documentId": {
+          "minLength": 1,
+          "title": "Documentid",
+          "type": "string"
+        },
+        "heritageId": {
+          "minLength": 1,
+          "title": "Heritageid",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "category": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Category"
+        },
+        "contentExcerpt": {
+          "maxLength": 1200,
+          "title": "Contentexcerpt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "documentId",
+        "heritageId",
+        "title",
+        "source",
+        "category",
+        "contentExcerpt"
+      ],
+      "title": "CultureDocument",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "documents": {
+      "items": {
+        "$ref": "#/$defs/CultureDocument"
+      },
+      "maxItems": 5,
+      "title": "Documents",
+      "type": "array"
+    }
+  },
+  "required": [
+    "documents"
+  ],
+  "title": "CultureSearchResponse",
+  "type": "object"
+}

@@ -1,0 +1,9 @@
+{
+  "method": "GET",
+  "path": "/internal/ai/experiences/101",
+  "query": {
+    "regionCode": "SEOUL",
+    "maxPriceKrw": "50000",
+    "headCount": "3"
+  }
+}

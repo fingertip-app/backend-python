@@ -1,0 +1,79 @@
+{
+  "$defs": {
+    "AgentRecommendation": {
+      "additionalProperties": false,
+      "properties": {
+        "experienceId": {
+          "exclusiveMinimum": 0,
+          "title": "Experienceid",
+          "type": "integer"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "evidenceKeys": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidencekeys",
+          "type": "array"
+        }
+      },
+      "required": [
+        "experienceId",
+        "reason",
+        "evidenceKeys"
+      ],
+      "title": "AgentRecommendation",
+      "type": "object"
+    },
+    "CultureClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "documentIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Documentids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "documentIds"
+      ],
+      "title": "CultureClaim",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "recommendations": {
+      "items": {
+        "$ref": "#/$defs/AgentRecommendation"
+      },
+      "title": "Recommendations",
+      "type": "array"
+    },
+    "cultureClaims": {
+      "items": {
+        "$ref": "#/$defs/CultureClaim"
+      },
+      "title": "Cultureclaims",
+      "type": "array"
+    }
+  },
+  "title": "AgentDraft",
+  "type": "object"
+}

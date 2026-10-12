@@ -1,0 +1,255 @@
+{
+  "$defs": {
+    "AgentConstraints": {
+      "additionalProperties": false,
+      "properties": {
+        "regionCode": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RegionCode"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "maxPriceKrw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maxpricekrw"
+        },
+        "headCount": {
+          "default": 1,
+          "maximum": 20,
+          "minimum": 1,
+          "title": "Headcount",
+          "type": "integer"
+        }
+      },
+      "title": "AgentConstraints",
+      "type": "object"
+    },
+    "AgentStatus": {
+      "enum": [
+        "completed",
+        "no_match",
+        "clarification_required",
+        "degraded"
+      ],
+      "title": "AgentStatus",
+      "type": "string"
+    },
+    "EvaluationCase": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "groupId": {
+          "minLength": 1,
+          "title": "Groupid",
+          "type": "string"
+        },
+        "split": {
+          "enum": [
+            "dev",
+            "test"
+          ],
+          "title": "Split",
+          "type": "string"
+        },
+        "category": {
+          "minLength": 1,
+          "title": "Category",
+          "type": "string"
+        },
+        "query": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Query",
+          "type": "string"
+        },
+        "locale": {
+          "const": "ko",
+          "default": "ko",
+          "title": "Locale",
+          "type": "string"
+        },
+        "constraints": {
+          "$ref": "#/$defs/AgentConstraints"
+        },
+        "supportedMode": {
+          "enum": [
+            "culture",
+            "recommendation"
+          ],
+          "title": "Supportedmode",
+          "type": "string"
+        },
+        "allowedIds": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Allowedids",
+          "type": "array"
+        },
+        "forbiddenIds": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Forbiddenids",
+          "type": "array"
+        },
+        "expectedStatus": {
+          "$ref": "#/$defs/AgentStatus"
+        },
+        "expectedSourceIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Expectedsourceids",
+          "type": "array"
+        },
+        "unsupportedConstraints": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unsupportedconstraints",
+          "type": "array"
+        },
+        "conflict": {
+          "default": false,
+          "title": "Conflict",
+          "type": "boolean"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "groupId",
+        "split",
+        "category",
+        "query",
+        "supportedMode",
+        "allowedIds",
+        "forbiddenIds",
+        "expectedStatus",
+        "expectedSourceIds",
+        "rationale"
+      ],
+      "title": "EvaluationCase",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "synthetic",
+            "heritage_snapshot"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "createdOn": {
+          "title": "Createdon",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "humanReviewed": {
+          "title": "Humanreviewed",
+          "type": "boolean"
+        },
+        "note": {
+          "minLength": 1,
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "createdOn",
+        "source",
+        "humanReviewed",
+        "note"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "RegionCode": {
+      "enum": [
+        "SEOUL",
+        "GYEONGGI",
+        "INCHEON",
+        "BUSAN",
+        "JEJU"
+      ],
+      "title": "RegionCode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "dataset": {
+      "enum": [
+        "culture",
+        "recommendation"
+      ],
+      "title": "Dataset",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "corpusFile": {
+      "minLength": 1,
+      "title": "Corpusfile",
+      "type": "string"
+    },
+    "snapshotHash": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Snapshothash",
+      "type": "string"
+    },
+    "cases": {
+      "items": {
+        "$ref": "#/$defs/EvaluationCase"
+      },
+      "minItems": 1,
+      "title": "Cases",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "dataset",
+    "provenance",
+    "corpusFile",
+    "snapshotHash",
+    "cases"
+  ],
+  "title": "EvaluationDataset",
+  "type": "object"
+}

@@ -1,0 +1,85 @@
+{
+  "explain": {
+    "path": "/api/v1/ai/explain",
+    "request": {
+      "query": "판소리",
+      "locale": "ko"
+    },
+    "statusCode": 200,
+    "response": {
+      "answer": "전통 문화 설명",
+      "sources": [
+        {
+          "id": 9001,
+          "name": "합성 판소리",
+          "source": "synthetic://legacy",
+          "category": "음악"
+        }
+      ],
+      "matchingKeywords": [
+        "판소리"
+      ],
+      "recommendedCategories": [
+        "음악"
+      ]
+    }
+  },
+  "recommendation": {
+    "path": "/api/v1/ai/recommendations",
+    "request": {
+      "freeText": "한지"
+    },
+    "statusCode": 200,
+    "response": {
+      "answer": "체험 추천",
+      "recommendedExperienceIds": [
+        101
+      ],
+      "reasons": {
+        "101": "한지 공예"
+      },
+      "matchingKeywords": [
+        "한지"
+      ],
+      "sources": [],
+      "fallback": false,
+      "message": null
+    }
+  },
+  "recommendationFailure": {
+    "path": "/api/v1/ai/recommendations",
+    "request": {
+      "freeText": "한지"
+    },
+    "statusCode": 200,
+    "response": {
+      "answer": "현재 AI 서비스와의 연결이 원활하지 않아요.",
+      "recommendedExperienceIds": [],
+      "reasons": {},
+      "matchingKeywords": [],
+      "sources": [],
+      "fallback": true,
+      "message": "AI 서비스가 일시적으로 불안정합니다."
+    }
+  },
+  "missingKey": {
+    "path": "/api/v1/ai/explain",
+    "request": {
+      "query": "판소리"
+    },
+    "statusCode": 401,
+    "response": {
+      "detail": "Missing X-Internal-Api-Key header"
+    }
+  },
+  "invalidKey": {
+    "path": "/api/v1/ai/explain",
+    "request": {
+      "query": "판소리"
+    },
+    "statusCode": 403,
+    "response": {
+      "detail": "Invalid X-Internal-Api-Key"
+    }
+  }
+}

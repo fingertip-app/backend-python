@@ -1,0 +1,251 @@
+[
+  {
+    "model": "AgentConstraints",
+    "name": "{'headCount': 0}",
+    "payload": {
+      "headCount": 0
+    }
+  },
+  {
+    "model": "AgentConstraints",
+    "name": "{'headCount': 21}",
+    "payload": {
+      "headCount": 21
+    }
+  },
+  {
+    "model": "AgentConstraints",
+    "name": "{'headCount': 1.5}",
+    "payload": {
+      "headCount": 1.5
+    }
+  },
+  {
+    "model": "AgentConstraints",
+    "name": "{'headCount': '3'}",
+    "payload": {
+      "headCount": "3"
+    }
+  },
+  {
+    "model": "AgentConstraints",
+    "name": "{'headCount': None}",
+    "payload": {
+      "headCount": null
+    }
+  },
+  {
+    "model": "AgentConstraints",
+    "name": "{'maxPriceKrw': '-0.01'}",
+    "payload": {
+      "maxPriceKrw": "-0.01"
+    }
+  },
+  {
+    "model": "AgentConstraints",
+    "name": "{'maxPriceKrw': '50000.001'}",
+    "payload": {
+      "maxPriceKrw": "50000.001"
+    }
+  },
+  {
+    "model": "AgentConstraints",
+    "name": "{'maxPriceKrw': 'NaN'}",
+    "payload": {
+      "maxPriceKrw": "NaN"
+    }
+  },
+  {
+    "model": "AgentConstraints",
+    "name": "{'regionCode': 'DAEGU'}",
+    "payload": {
+      "regionCode": "DAEGU"
+    }
+  },
+  {
+    "model": "AgentConstraints",
+    "name": "{'regionCode': 0}",
+    "payload": {
+      "regionCode": 0
+    }
+  },
+  {
+    "model": "AgentConstraints",
+    "name": "{'extra': 1}",
+    "payload": {
+      "extra": 1
+    }
+  },
+  {
+    "model": "AgentRequest",
+    "name": "{'query': ''}",
+    "payload": {
+      "query": ""
+    }
+  },
+  {
+    "model": "AgentRequest",
+    "name": "{'query': ' '}",
+    "payload": {
+      "query": " "
+    }
+  },
+  {
+    "model": "AgentRequest",
+    "name": "{'query': '가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+    "payload": {
+      "query": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가"
+    }
+  },
+  {
+    "model": "AgentRequest",
+    "name": "{'query': '한지', 'locale': 'en'}",
+    "payload": {
+      "query": "한지",
+      "locale": "en"
+    }
+  },
+  {
+    "model": "AgentRequest",
+    "name": "{'query': '한지', 'locale': None}",
+    "payload": {
+      "query": "한지",
+      "locale": null
+    }
+  },
+  {
+    "model": "AgentRequest",
+    "name": "{'query': '한지', 'constraints': None}",
+    "payload": {
+      "query": "한지",
+      "constraints": null
+    }
+  },
+  {
+    "model": "AgentRequest",
+    "name": "{'query': '한지', 'constraints': {'extra': 1}}",
+    "payload": {
+      "query": "한지",
+      "constraints": {
+        "extra": 1
+      }
+    }
+  },
+  {
+    "model": "AgentRequest",
+    "name": "{'query': '한지', 'extra': 1}",
+    "payload": {
+      "query": "한지",
+      "extra": 1
+    }
+  },
+  {
+    "model": "CatalogSearchRequest",
+    "name": "{'queryTerms': []}",
+    "payload": {
+      "queryTerms": []
+    }
+  },
+  {
+    "model": "CatalogSearchRequest",
+    "name": "{'queryTerms': ['a', 'a', 'a', 'a', 'a', 'a']}",
+    "payload": {
+      "queryTerms": [
+        "a",
+        "a",
+        "a",
+        "a",
+        "a",
+        "a"
+      ]
+    }
+  },
+  {
+    "model": "CatalogSearchRequest",
+    "name": "{'queryTerms': [' ']}",
+    "payload": {
+      "queryTerms": [
+        " "
+      ]
+    }
+  },
+  {
+    "model": "CatalogSearchRequest",
+    "name": "{'queryTerms': ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']}",
+    "payload": {
+      "queryTerms": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ]
+    }
+  },
+  {
+    "model": "CatalogSearchRequest",
+    "name": "{'queryTerms': ['한지'], 'limit': 0}",
+    "payload": {
+      "queryTerms": [
+        "한지"
+      ],
+      "limit": 0
+    }
+  },
+  {
+    "model": "CatalogSearchRequest",
+    "name": "{'queryTerms': ['한지'], 'limit': 11}",
+    "payload": {
+      "queryTerms": [
+        "한지"
+      ],
+      "limit": 11
+    }
+  },
+  {
+    "model": "CatalogSearchRequest",
+    "name": "{'queryTerms': ['한지'], 'limit': 1.5}",
+    "payload": {
+      "queryTerms": [
+        "한지"
+      ],
+      "limit": 1.5
+    }
+  },
+  {
+    "model": "CatalogSearchRequest",
+    "name": "{'queryTerms': ['한지'], 'limit': '5'}",
+    "payload": {
+      "queryTerms": [
+        "한지"
+      ],
+      "limit": "5"
+    }
+  },
+  {
+    "model": "CatalogSearchRequest",
+    "name": "{'queryTerms': ['한지'], 'constraints': None}",
+    "payload": {
+      "queryTerms": [
+        "한지"
+      ],
+      "constraints": null
+    }
+  },
+  {
+    "model": "CatalogSearchRequest",
+    "name": "{'queryTerms': ['한지'], 'limit': None}",
+    "payload": {
+      "queryTerms": [
+        "한지"
+      ],
+      "limit": null
+    }
+  },
+  {
+    "model": "CatalogSearchRequest",
+    "name": "{'queryTerms': ['한지'], 'regionCode': 'SEOUL'}",
+    "payload": {
+      "queryTerms": [
+        "한지"
+      ],
+      "regionCode": "SEOUL"
+    }
+  }
+]

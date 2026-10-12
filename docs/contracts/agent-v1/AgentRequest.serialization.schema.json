@@ -1,0 +1,74 @@
+{
+  "$defs": {
+    "AgentConstraints": {
+      "additionalProperties": false,
+      "properties": {
+        "regionCode": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RegionCode"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "maxPriceKrw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maxpricekrw"
+        },
+        "headCount": {
+          "default": 1,
+          "maximum": 20,
+          "minimum": 1,
+          "title": "Headcount",
+          "type": "integer"
+        }
+      },
+      "title": "AgentConstraints",
+      "type": "object"
+    },
+    "RegionCode": {
+      "enum": [
+        "SEOUL",
+        "GYEONGGI",
+        "INCHEON",
+        "BUSAN",
+        "JEJU"
+      ],
+      "title": "RegionCode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "query": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Query",
+      "type": "string"
+    },
+    "locale": {
+      "const": "ko",
+      "default": "ko",
+      "title": "Locale",
+      "type": "string"
+    },
+    "constraints": {
+      "$ref": "#/$defs/AgentConstraints"
+    }
+  },
+  "required": [
+    "query"
+  ],
+  "title": "AgentRequest",
+  "type": "object"
+}

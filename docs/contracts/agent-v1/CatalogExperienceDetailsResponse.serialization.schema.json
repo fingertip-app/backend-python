@@ -1,0 +1,81 @@
+{
+  "$defs": {
+    "RegionCode": {
+      "enum": [
+        "SEOUL",
+        "GYEONGGI",
+        "INCHEON",
+        "BUSAN",
+        "JEJU"
+      ],
+      "title": "RegionCode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "exclusiveMinimum": 0,
+      "title": "Id",
+      "type": "integer"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "descriptionExcerpt": {
+      "maxLength": 1200,
+      "title": "Descriptionexcerpt",
+      "type": "string"
+    },
+    "tags": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Tags",
+      "type": "array"
+    },
+    "priceKrw": {
+      "title": "Pricekrw",
+      "type": "string"
+    },
+    "maxParticipants": {
+      "minimum": 1,
+      "title": "Maxparticipants",
+      "type": "integer"
+    },
+    "regionCode": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RegionCode"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "isActive": {
+      "title": "Isactive",
+      "type": "boolean"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "descriptionExcerpt",
+    "tags",
+    "priceKrw",
+    "maxParticipants",
+    "regionCode",
+    "isActive",
+    "description"
+  ],
+  "title": "CatalogExperienceDetailsResponse",
+  "type": "object"
+}

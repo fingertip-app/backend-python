@@ -1,0 +1,213 @@
+{
+  "$defs": {
+    "AgentConstraints": {
+      "additionalProperties": false,
+      "properties": {
+        "regionCode": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RegionCode"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "maxPriceKrw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maxpricekrw"
+        },
+        "headCount": {
+          "default": 1,
+          "maximum": 20,
+          "minimum": 1,
+          "title": "Headcount",
+          "type": "integer"
+        }
+      },
+      "title": "AgentConstraints",
+      "type": "object"
+    },
+    "AgentRecommendation": {
+      "additionalProperties": false,
+      "properties": {
+        "experienceId": {
+          "exclusiveMinimum": 0,
+          "title": "Experienceid",
+          "type": "integer"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "evidenceKeys": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidencekeys",
+          "type": "array"
+        }
+      },
+      "required": [
+        "experienceId",
+        "reason",
+        "evidenceKeys"
+      ],
+      "title": "AgentRecommendation",
+      "type": "object"
+    },
+    "AgentStatus": {
+      "enum": [
+        "completed",
+        "no_match",
+        "clarification_required",
+        "degraded"
+      ],
+      "title": "AgentStatus",
+      "type": "string"
+    },
+    "CultureDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "documentId": {
+          "minLength": 1,
+          "title": "Documentid",
+          "type": "string"
+        },
+        "heritageId": {
+          "minLength": 1,
+          "title": "Heritageid",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "category": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Category"
+        },
+        "contentExcerpt": {
+          "maxLength": 1200,
+          "title": "Contentexcerpt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "documentId",
+        "heritageId",
+        "title",
+        "source",
+        "category",
+        "contentExcerpt"
+      ],
+      "title": "CultureDocument",
+      "type": "object"
+    },
+    "RegionCode": {
+      "enum": [
+        "SEOUL",
+        "GYEONGGI",
+        "INCHEON",
+        "BUSAN",
+        "JEJU"
+      ],
+      "title": "RegionCode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "$ref": "#/$defs/AgentStatus"
+    },
+    "answer": {
+      "minLength": 1,
+      "title": "Answer",
+      "type": "string"
+    },
+    "recommendedExperienceIds": {
+      "items": {
+        "exclusiveMinimum": 0,
+        "type": "integer"
+      },
+      "title": "Recommendedexperienceids",
+      "type": "array"
+    },
+    "recommendations": {
+      "items": {
+        "$ref": "#/$defs/AgentRecommendation"
+      },
+      "title": "Recommendations",
+      "type": "array"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/CultureDocument"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "appliedConstraints": {
+      "$ref": "#/$defs/AgentConstraints"
+    },
+    "unsupportedConstraints": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Unsupportedconstraints",
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "requestId": {
+      "minLength": 1,
+      "title": "Requestid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "answer",
+    "recommendedExperienceIds",
+    "recommendations",
+    "sources",
+    "appliedConstraints",
+    "unsupportedConstraints",
+    "limitations",
+    "requestId"
+  ],
+  "title": "AgentResponse",
+  "type": "object"
+}

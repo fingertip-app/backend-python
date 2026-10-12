@@ -1,0 +1,17 @@
+{
+  "status": "clarification_required",
+  "answer": "서울과 부산 중 어느 지역을 원하시나요?",
+  "recommendedExperienceIds": [],
+  "recommendations": [],
+  "sources": [],
+  "appliedConstraints": {
+    "regionCode": "SEOUL",
+    "maxPriceKrw": "50000",
+    "headCount": 3
+  },
+  "unsupportedConstraints": [],
+  "limitations": [
+    "일정별 잔여 좌석은 확인하지 않았습니다."
+  ],
+  "requestId": "agent-demo-002"
+}

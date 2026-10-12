@@ -1,0 +1,588 @@
+{
+  "schemaVersion": "1",
+  "dataset": "recommendation",
+  "provenance": {
+    "kind": "synthetic",
+    "createdOn": "2026-10-12",
+    "source": "Task 1 authored fixture; no live database or heritage API snapshot",
+    "humanReviewed": false,
+    "note": "합성 계약 검증 seed. 실제 문화유산 ID, 사람 검수 또는 측정된 AI 품질을 주장하지 않습니다."
+  },
+  "corpusFile": "catalog.json",
+  "snapshotHash": "86f861e7dfeae2a342a31c2ae7833706d03897eb0a7d6dfa552d71b396e34085",
+  "cases": [
+    {
+      "id": "recommendation-01",
+      "groupId": "rec-1",
+      "split": "dev",
+      "category": "normal",
+      "query": "서울 한지 체험",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "SEOUL",
+        "maxPriceKrw": null,
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        101,
+        102,
+        103
+      ],
+      "forbiddenIds": [
+        106,
+        107,
+        112
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-02",
+      "groupId": "rec-2",
+      "split": "dev",
+      "category": "normal",
+      "query": "경기 도자기 체험",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "GYEONGGI",
+        "maxPriceKrw": null,
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        104
+      ],
+      "forbiddenIds": [
+        108,
+        110
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-03",
+      "groupId": "rec-3",
+      "split": "dev",
+      "category": "normal",
+      "query": "부산 매듭 체험",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "BUSAN",
+        "maxPriceKrw": null,
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        105
+      ],
+      "forbiddenIds": [
+        109,
+        111
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-04",
+      "groupId": "rec-4",
+      "split": "test",
+      "category": "normal",
+      "query": "서울 도자기 체험",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "SEOUL",
+        "maxPriceKrw": null,
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        108
+      ],
+      "forbiddenIds": [
+        104,
+        110
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-05",
+      "groupId": "rec-5",
+      "split": "test",
+      "category": "normal",
+      "query": "경기 매듭 체험",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "GYEONGGI",
+        "maxPriceKrw": null,
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        109
+      ],
+      "forbiddenIds": [
+        105,
+        111
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-06",
+      "groupId": "rec-6",
+      "split": "dev",
+      "category": "price_boundary",
+      "query": "서울 한지 1인당 5만원 이하",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "SEOUL",
+        "maxPriceKrw": "50000",
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        101,
+        103
+      ],
+      "forbiddenIds": [
+        102,
+        106,
+        107,
+        112
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-07",
+      "groupId": "rec-7",
+      "split": "dev",
+      "category": "price_boundary",
+      "query": "서울 한지 1인당 50000.01원 이하",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "SEOUL",
+        "maxPriceKrw": "50000.01",
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        101,
+        102,
+        103
+      ],
+      "forbiddenIds": [
+        106,
+        107,
+        112
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-08",
+      "groupId": "rec-8",
+      "split": "test",
+      "category": "price_boundary",
+      "query": "서울 한지 1인당 49999.99원 이하",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "SEOUL",
+        "maxPriceKrw": "49999.99",
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        103
+      ],
+      "forbiddenIds": [
+        101,
+        102,
+        106,
+        107,
+        112
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-09",
+      "groupId": "rec-9",
+      "split": "test",
+      "category": "price_boundary",
+      "query": "서울 무료 도자기 체험",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "SEOUL",
+        "maxPriceKrw": "0",
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        108
+      ],
+      "forbiddenIds": [
+        104,
+        110
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-10",
+      "groupId": "rec-10",
+      "split": "test",
+      "category": "price_boundary",
+      "query": "부산 도자기 1인당 5만원 이하",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "BUSAN",
+        "maxPriceKrw": "50000",
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [],
+      "forbiddenIds": [
+        104,
+        108,
+        110
+      ],
+      "expectedStatus": "no_match",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-11",
+      "groupId": "rec-11",
+      "split": "dev",
+      "category": "region_headcount",
+      "query": "서울 한지 세 명",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "SEOUL",
+        "maxPriceKrw": null,
+        "headCount": 3
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        101,
+        102
+      ],
+      "forbiddenIds": [
+        103,
+        106,
+        107,
+        112
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-12",
+      "groupId": "rec-12",
+      "split": "dev",
+      "category": "region_headcount",
+      "query": "서울 한지 네 명",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "SEOUL",
+        "maxPriceKrw": null,
+        "headCount": 4
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        102
+      ],
+      "forbiddenIds": [
+        101,
+        103,
+        106,
+        107,
+        112
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-13",
+      "groupId": "rec-13",
+      "split": "dev",
+      "category": "region_headcount",
+      "query": "주소 없어도 한지 네 명",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": null,
+        "maxPriceKrw": null,
+        "headCount": 4
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        102,
+        107
+      ],
+      "forbiddenIds": [
+        101,
+        103,
+        106,
+        112
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-14",
+      "groupId": "rec-14",
+      "split": "test",
+      "category": "region_headcount",
+      "query": "서울 한지 두 명",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "SEOUL",
+        "maxPriceKrw": null,
+        "headCount": 2
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [
+        101,
+        102,
+        103
+      ],
+      "forbiddenIds": [
+        106,
+        107,
+        112
+      ],
+      "expectedStatus": "completed",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-15",
+      "groupId": "rec-15",
+      "split": "test",
+      "category": "region_headcount",
+      "query": "부산 매듭 네 명",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "BUSAN",
+        "maxPriceKrw": null,
+        "headCount": 4
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [],
+      "forbiddenIds": [
+        105,
+        109,
+        111
+      ],
+      "expectedStatus": "no_match",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-16",
+      "groupId": "rec-16",
+      "split": "dev",
+      "category": "empty_inactive_ambiguous",
+      "query": "제주 한지 체험",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "JEJU",
+        "maxPriceKrw": null,
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [],
+      "forbiddenIds": [
+        101,
+        102,
+        103,
+        106,
+        107,
+        112
+      ],
+      "expectedStatus": "no_match",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-17",
+      "groupId": "rec-17",
+      "split": "dev",
+      "category": "empty_inactive_ambiguous",
+      "query": "부산 한지 체험",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "BUSAN",
+        "maxPriceKrw": null,
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [],
+      "forbiddenIds": [
+        101,
+        102,
+        103,
+        106,
+        107,
+        112
+      ],
+      "expectedStatus": "no_match",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "active/지역/1인당 가격/프로그램 정원 기준 수동 도출. 일정별 잔여 좌석은 검증하지 않음"
+    },
+    {
+      "id": "recommendation-18",
+      "groupId": "rec-18",
+      "split": "test",
+      "category": "empty_inactive_ambiguous",
+      "query": "서울 한지 예산 총 5만원",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": null,
+        "maxPriceKrw": null,
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [],
+      "forbiddenIds": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112
+      ],
+      "expectedStatus": "clarification_required",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": false,
+      "rationale": "예산 단위가 총액인지 1인당인지 확인 필요"
+    },
+    {
+      "id": "recommendation-19",
+      "groupId": "rec-19",
+      "split": "test",
+      "category": "empty_inactive_ambiguous",
+      "query": "서울 한지 체험, 부산으로 찾아줘",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "SEOUL",
+        "maxPriceKrw": null,
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [],
+      "forbiddenIds": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112
+      ],
+      "expectedStatus": "clarification_required",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [],
+      "conflict": true,
+      "rationale": "자연어 부산과 구조화 서울 충돌"
+    },
+    {
+      "id": "recommendation-20",
+      "groupId": "rec-20",
+      "split": "test",
+      "category": "empty_inactive_ambiguous",
+      "query": "이번 주말 서울 한지 휠체어 체험",
+      "locale": "ko",
+      "constraints": {
+        "regionCode": "SEOUL",
+        "maxPriceKrw": null,
+        "headCount": 1
+      },
+      "supportedMode": "recommendation",
+      "allowedIds": [],
+      "forbiddenIds": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112
+      ],
+      "expectedStatus": "clarification_required",
+      "expectedSourceIds": [],
+      "unsupportedConstraints": [
+        "weekend",
+        "wheelchair_access"
+      ],
+      "conflict": false,
+      "rationale": "일정 및 접근성은 v1에서 검증하지 않음"
+    }
+  ]
+}
