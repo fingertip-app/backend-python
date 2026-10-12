@@ -1,0 +1,14 @@
+{
+  "id": 101,
+  "title": "서울 한지 만들기",
+  "descriptionExcerpt": "한지 공예 체험",
+  "tags": [
+    "한지",
+    "가족"
+  ],
+  "priceKrw": "50000",
+  "maxParticipants": 3,
+  "regionCode": "SEOUL",
+  "isActive": true,
+  "description": "합성 한지 만들기 프로그램의 상세 설명입니다."
+}

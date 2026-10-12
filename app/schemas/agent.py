@@ -1,13 +1,47 @@
 """Version-one wire contracts. These schemas do not expose an agent endpoint."""
+import json
+import re
 from decimal import Decimal
 from enum import StrEnum
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator, model_validator
+from pydantic import (AfterValidator, BaseModel, BeforeValidator, ConfigDict, Field, ValidationError,
+                      WithJsonSchema, field_serializer, model_validator)
+
+
+def parse_contract_json(raw: str | bytes | bytearray) -> Any:
+    """Read a raw request body without routing decimal numeric tokens through float.
+
+    Future HTTP routes must use this entry point on raw body bytes before model validation;
+    FastAPI's default JSON parser has already lost this precision by the model boundary.
+    """
+    def reject_constant(value: str) -> None:
+        raise ValueError(f'Non-finite JSON number: {value}')
+
+    return json.loads(raw, parse_float=Decimal, parse_constant=reject_constant)
 
 
 class StrictContract(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
+
+    @classmethod
+    def model_validate_json(
+        cls, json_data: str | bytes | bytearray, *, strict: bool | None = None,
+        extra: str | None = None, context: Any = None,
+        by_alias: bool | None = None, by_name: bool | None = None,
+    ) -> Self:
+        try:
+            value = parse_contract_json(json_data)
+        except (ValueError, UnicodeDecodeError) as error:
+            raise ValidationError.from_exception_data(cls.__name__, [{
+                'type': 'json_invalid', 'loc': (), 'input': json_data,
+                'ctx': {'error': str(error)},
+            }]) from error
+        options: dict[str, Any] = {'strict': strict, 'context': context,
+                                  'by_alias': by_alias, 'by_name': by_name}
+        if extra is not None:
+            options['extra'] = extra
+        return cls.model_validate(value, **options)
 
 
 class RegionCode(StrEnum):
@@ -25,7 +59,32 @@ class AgentStatus(StrEnum):
     DEGRADED = 'degraded'
 
 
-PriceKrw = Annotated[Decimal, Field(ge=0, decimal_places=2, allow_inf_nan=False)]
+# Strings use ordinary unsigned decimal notation; trailing fractional zeros do not
+# add monetary precision. Exponent notation is accepted only as a JSON number.
+PRICE_STRING_PATTERN = r'^[0-9]+(?:\.[0-9]{1,2}0*)?$'
+
+
+def validate_price_form(value: Any) -> Any:
+    if isinstance(value, bool):
+        raise ValueError('A price must be a decimal number or string')
+    if isinstance(value, str) and not re.fullmatch(PRICE_STRING_PATTERN, value):
+        raise ValueError('Price string must use unsigned decimal notation with cent precision')
+    return value
+
+
+def normalize_price_zero(value: Decimal) -> Decimal:
+    return value.copy_abs() if value.is_zero() else value
+
+
+PriceKrw = Annotated[
+    Decimal, BeforeValidator(validate_price_form),
+    Field(ge=0, decimal_places=2, allow_inf_nan=False), AfterValidator(normalize_price_zero),
+    WithJsonSchema({'anyOf': [
+        {'type': 'number', 'minimum': 0, 'multipleOf': 0.01},
+        {'type': 'string', 'pattern': PRICE_STRING_PATTERN},
+    ]}, mode='validation'),
+    WithJsonSchema({'type': 'string', 'pattern': PRICE_STRING_PATTERN}, mode='serialization'),
+]
 Text = Annotated[str, Field(min_length=1)]
 QueryTerm = Annotated[str, Field(min_length=1, max_length=50)]
 

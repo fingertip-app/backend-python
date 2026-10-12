@@ -1,0 +1,12 @@
+{
+  "documents": [
+    {
+      "documentId": "synthetic:pansori:001",
+      "heritageId": "synthetic-heritage:pansori",
+      "title": "판소리",
+      "source": "synthetic://task-1/culture-corpus",
+      "category": "음악",
+      "contentExcerpt": "판소리는 소리꾼과 고수의 북 장단으로 이야기를 전하는 공연과 관련된 종목이다."
+    }
+  ]
+}

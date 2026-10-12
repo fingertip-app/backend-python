@@ -1,13 +1,12 @@
 """Load versioned offline seeds and verify their exact referenced fixture snapshot."""
 import hashlib
-import json
 from pathlib import Path
 from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
 from app.schemas.agent import (AgentConstraints, AgentStatus, CatalogExperienceResponse,
-                               CultureDocument, StrictContract, Text)
+                               CultureDocument, StrictContract, Text, parse_contract_json)
 
 
 class Provenance(StrictContract):
@@ -93,7 +92,7 @@ def load_dataset(path: Path | str) -> EvaluationDataset:
     corpus_bytes = corpus_path.read_bytes()
     if hashlib.sha256(corpus_bytes).hexdigest() != dataset.snapshotHash:
         raise ValueError('Fixture snapshot hash mismatch')
-    raw = json.loads(corpus_bytes)
+    raw = parse_contract_json(corpus_bytes)
     if dataset.dataset == 'culture':
         corpus = CultureFixture.model_validate(raw)
         ids = [document.documentId for document in corpus.documents]

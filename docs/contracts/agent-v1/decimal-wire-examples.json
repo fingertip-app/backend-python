@@ -1,0 +1,50 @@
+[
+  {
+    "name": "large-exact",
+    "inputJson": "{\"maxPriceKrw\":9007199254740993.01}",
+    "valid": true,
+    "maxPriceKrw": "9007199254740993.01"
+  },
+  {
+    "name": "excess-numeric-scale",
+    "inputJson": "{\"maxPriceKrw\":50000.000000000001}",
+    "valid": false,
+    "maxPriceKrw": null
+  },
+  {
+    "name": "numeric-exponent",
+    "inputJson": "{\"maxPriceKrw\":5e4}",
+    "valid": true,
+    "maxPriceKrw": "50000"
+  },
+  {
+    "name": "trailing-zeros",
+    "inputJson": "{\"maxPriceKrw\":\"1.000\"}",
+    "valid": true,
+    "maxPriceKrw": "1.000"
+  },
+  {
+    "name": "string-exponent",
+    "inputJson": "{\"maxPriceKrw\":\"1e2\"}",
+    "valid": false,
+    "maxPriceKrw": null
+  },
+  {
+    "name": "signed-string",
+    "inputJson": "{\"maxPriceKrw\":\"+1\"}",
+    "valid": false,
+    "maxPriceKrw": null
+  },
+  {
+    "name": "bool-amount",
+    "inputJson": "{\"maxPriceKrw\":true}",
+    "valid": false,
+    "maxPriceKrw": null
+  },
+  {
+    "name": "numeric-negative-zero",
+    "inputJson": "{\"maxPriceKrw\":-0.00}",
+    "valid": true,
+    "maxPriceKrw": "0.00"
+  }
+]

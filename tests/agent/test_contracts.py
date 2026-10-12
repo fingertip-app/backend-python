@@ -7,7 +7,8 @@ import pytest
 from pydantic import ValidationError
 
 from app.schemas.agent import (AgentConstraints, AgentRequest, AgentResponse,
-                               CatalogExperienceResponse, CatalogSearchRequest)
+                               CatalogExperienceResponse, CatalogSearchRequest, CatalogExperienceDetailsResponse,
+                               CultureSearchRequest, CultureSearchResponse, AgentDraft)
 
 CONTRACTS = Path('docs/contracts/agent-v1')
 
@@ -55,7 +56,9 @@ def test_catalog_rejects_invalid_search(payload):
 def test_shared_examples_round_trip_without_price_loss():
     for file, model in [('request.json', AgentRequest), ('completed.json', AgentResponse),
                         ('clarification.json', AgentResponse), ('catalog-item.json', CatalogExperienceResponse),
-                        ('catalog-search.json', CatalogSearchRequest)]:
+                        ('catalog-search.json', CatalogSearchRequest), ('catalog-detail.json', CatalogExperienceDetailsResponse),
+                        ('culture-search.json', CultureSearchRequest), ('culture-documents.json', CultureSearchResponse),
+                        ('draft.json', AgentDraft)]:
         raw = json.loads((CONTRACTS / file).read_text())
         assert json.loads(model.model_validate(raw).model_dump_json()) == raw
 
@@ -76,3 +79,52 @@ def test_shared_invalid_examples_are_rejected():
     for example in json.loads((CONTRACTS / 'invalid-examples.json').read_text()):
         with pytest.raises(ValidationError):
             models[example['model']].model_validate(example['payload'])
+
+
+def test_raw_json_preserves_large_numeric_decimal_without_rounding():
+    constraints = AgentConstraints.model_validate_json('{"maxPriceKrw":9007199254740993.01}')
+    assert constraints.maxPriceKrw == Decimal('9007199254740993.01')
+    assert json.loads(constraints.model_dump_json())['maxPriceKrw'] == '9007199254740993.01'
+
+
+def test_raw_json_rejects_original_excess_precision_before_rounding():
+    with pytest.raises(ValidationError):
+        AgentConstraints.model_validate_json('{"maxPriceKrw":50000.000000000001}')
+
+
+@pytest.mark.parametrize('amount,accepted', [
+    ('50000.01', True), ('9007199254740993.01', True), ('0', True), ('1.000', True),
+    ('-0.01', False), ('50000.001', False), ('50000.000000000001', False),
+    ('1e2', False), ('+1', False), ('NaN', False),
+])
+def test_price_string_schema_and_runtime_accept_the_same_forms(amount, accepted):
+    import jsonschema
+
+    schema = json.loads((CONTRACTS / 'AgentRequest.validation.schema.json').read_text())
+    payload = {'query': '한지', 'constraints': {'maxPriceKrw': amount}}
+    errors = list(jsonschema.Draft202012Validator(schema).iter_errors(payload))
+    assert (not errors) is accepted
+    if accepted:
+        AgentRequest.model_validate(payload)
+    else:
+        with pytest.raises(ValidationError):
+            AgentRequest.model_validate(payload)
+
+
+@pytest.mark.parametrize('amount,accepted', [(Decimal('50000.01'), True), (Decimal('50000.001'), False), (Decimal('-0.01'), False)])
+def test_price_numeric_validation_schema_enforces_nonnegative_cents(amount, accepted):
+    import jsonschema
+
+    schema = json.loads((CONTRACTS / 'AgentRequest.validation.schema.json').read_text(), parse_float=Decimal)
+    errors = list(jsonschema.Draft202012Validator(schema).iter_errors({'query': '한지', 'constraints': {'maxPriceKrw': amount}}))
+    assert (not errors) is accepted
+
+
+def test_shared_raw_decimal_examples_keep_original_numeric_tokens():
+    for example in json.loads((CONTRACTS / 'decimal-wire-examples.json').read_text()):
+        if example['valid']:
+            value = AgentConstraints.model_validate_json(example['inputJson'])
+            assert json.loads(value.model_dump_json())['maxPriceKrw'] == example['maxPriceKrw']
+        else:
+            with pytest.raises(ValidationError):
+                AgentConstraints.model_validate_json(example['inputJson'])

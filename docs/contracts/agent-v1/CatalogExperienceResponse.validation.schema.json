@@ -40,11 +40,12 @@
     "priceKrw": {
       "anyOf": [
         {
-          "minimum": 0.0,
+          "minimum": 0,
+          "multipleOf": 0.01,
           "type": "number"
         },
         {
-          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d{0,2}0*$",
+          "pattern": "^[0-9]+(?:\\.[0-9]{1,2}0*)?$",
           "type": "string"
         }
       ],
