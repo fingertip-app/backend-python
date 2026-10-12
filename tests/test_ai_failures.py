@@ -78,7 +78,8 @@ def test_ai_explain_query_empty(client):
         headers=auth_headers(),
     )
 
-    assert response.status_code == 422
+    assert response.status_code == 400
+    assert response.json()["errorCode"] == "INVALID_REQUEST"
 
 
 def test_ai_explain_openai_key_not_set(client):

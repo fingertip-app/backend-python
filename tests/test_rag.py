@@ -87,8 +87,8 @@ def test_explain_retrieves_sources_and_generates_answer(monkeypatch):
     assert result["sources"] == [
         {"id": 7, "name": "매듭장", "source": "국가유산포털", "category": "공예"}
     ]
-    assert result["matchingKeywords"] == ["매듭장"]
-    assert result["recommendedCategories"] == ["공예"]
+    assert set(result["matchingKeywords"]) == {"전통매듭", "체험형", "소품만들기"}
+    assert set(result["recommendedCategories"]) == {"체험형", "소품만들기"}
     assert client.embeddings.call["model"] == "embedding-model"
     assert "매듭이 뭐예요?" in client.responses.call["input"]
     assert client.responses.call["model"] == "generation-model"
