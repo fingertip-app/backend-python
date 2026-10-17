@@ -17,7 +17,7 @@ Current reference files:
 | 1 | Normal response with valid internal API key | `200`, response includes `answer`, `sources`, `matchingKeywords`, `recommendedCategories` | ✅ `test_internal_auth.py::test_ai_explain_valid_key` |
 | 2 | Missing internal API key header | `401`, `detail=Missing X-Internal-Api-Key header` | ✅ `test_ai_failures.py::test_ai_explain_missing_internal_key`; `test_internal_auth.py::test_ai_explain_missing_header` |
 | 3 | Invalid internal API key | `403`, `detail=Invalid X-Internal-Api-Key` | ✅ `test_ai_failures.py::test_ai_explain_invalid_internal_key`; `test_internal_auth.py::test_ai_explain_invalid_key` |
-| 4 | Request validation failure: empty query | `422` | ✅ `test_ai_failures.py::test_ai_explain_query_empty` |
+| 4 | Request validation failure: empty query | `400`, `errorCode=INVALID_REQUEST` | ✅ `test_ai_failures.py::test_ai_explain_query_empty` |
 | 5 | OpenAI API key not configured | `503`, `detail=OpenAI API is not configured` | ✅ `test_ai_failures.py::test_ai_explain_openai_key_not_set` |
 | 6 | Embedding provider failure | `502`, `detail=Embedding provider request failed` | ✅ `test_ai_failures.py::test_ai_explain_embedding_failure` |
 | 7 | Generation provider failure | `502`, `detail=Generation provider request failed` | ✅ `test_ai_failures.py::test_ai_explain_generation_failure` |

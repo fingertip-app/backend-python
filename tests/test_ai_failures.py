@@ -78,7 +78,12 @@ def test_ai_explain_query_empty(client):
         headers=auth_headers(),
     )
 
-    assert response.status_code == 422
+    # The app's validation handler returns 400; Spring accepts this as an invalid request.
+    assert response.status_code == 400
+    assert response.json()["success"] is False
+    assert response.json()["message"] == "AI query validation failed"
+    assert response.json()["errorCode"] == "INVALID_REQUEST"
+    assert [error["loc"][-1] for error in response.json()["details"]] == ["query"]
 
 
 def test_ai_explain_openai_key_not_set(client):

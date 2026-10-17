@@ -56,10 +56,12 @@ FastAPI response (`200`):
       "category": "공예"
     }
   ],
-  "matchingKeywords": ["매듭장"],
-  "recommendedCategories": ["공예"]
+  "matchingKeywords": ["전통매듭", "체험형", "소품만들기"],
+  "recommendedCategories": ["체험형", "소품만들기"]
 }
 ```
+
+`matchingKeywords`와 `recommendedCategories`는 문화유산 이름·분류를 앱의 체험 태그로 매핑한 후보입니다. 현재 매퍼는 일반 태그도 포함하며, 두 배열의 순서는 보장하지 않습니다.
 
 When no source document is retrieved, FastAPI still responds with `200`, an
 explanatory `answer`, and empty source/matching arrays.
@@ -89,11 +91,17 @@ Spring-side experience matching is implemented.
 
 ## Failure Contract
 
-FastAPI uses FastAPI's JSON error detail response for non-`200` failures:
+FastAPI uses a standard `detail` response for most non-`200` failures. Request
+validation has a dedicated `400` response:
 
 ```json
 {
-  "detail": "Error description"
+  "success": false,
+  "message": "AI query validation failed",
+  "errorCode": "INVALID_REQUEST",
+  "details": [
+    {"loc": ["body", "query"], "msg": "String should have at least 1 character", "type": "string_too_short"}
+  ]
 }
 ```
 
@@ -105,7 +113,7 @@ FastAPI uses FastAPI's JSON error detail response for non-`200` failures:
 | OpenAI API key not configured | `503` | AI unavailable; fallback may apply in FastAPI when enabled |
 | OpenAI embedding request failed | `502` | Spring retries provider `502` once, then returns AI unavailable if retry fails |
 | OpenAI generation request failed | `502` | Spring retries provider `502` once, then returns AI unavailable if retry fails |
-| Empty/invalid request | `422` | Spring validates before calling; expose bad request |
+| Empty/invalid request | `400` | Spring rejects as an invalid request; no retry |
 | FastAPI network timeout | no response | Return AI timeout response to app |
 
 Structured AI error codes are a follow-up improvement; Spring must not parse
@@ -139,7 +147,7 @@ responses:
 }
 ```
 
-Fallback is not used for `401`, `403`, `422`, or successful `200` no-result
+Fallback is not used for `400`, `401`, `403`, or successful `200` no-result
 responses. If fallback is enabled but no demo entry matches, FastAPI returns
 `503` with `{"detail": "AI service unavailable"}`.
 
