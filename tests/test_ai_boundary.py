@@ -2,8 +2,12 @@ from app.db.base import Base
 from app.main import app
 
 
-def test_fastapi_owns_only_heritage_item_table():
-    assert set(Base.metadata.tables) == {"heritage_items"}
+def test_fastapi_ai_schema_tables_defined():
+    """AI 스키마와 Spring 소유 체험 테이블의 추천용 매핑을 등록한다"""
+    tables = {table.name for table in Base.metadata.tables.values()}
+    # experiences is mapped for recommendation reads; its base table is created by Spring.
+    expected = {"heritage_items", "vector_documents", "embedding_metadata", "experiences"}
+    assert tables == expected
 
 
 def test_spring_owned_external_routes_are_not_exposed():
