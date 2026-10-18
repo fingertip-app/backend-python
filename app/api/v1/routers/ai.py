@@ -1,4 +1,5 @@
 import logging
+import re
 from collections.abc import Callable
 from typing import Any
 
@@ -10,10 +11,11 @@ from app.api.v1.deps import get_db
 from app.core.config import settings
 from app.core.security import verify_internal_api_key
 from app.schemas.ai import ExplainResponse
-from app.services.ai.experience_rag import ExperienceRagService, get_experience_rag_service
+from app.services.ai.experience_rag import get_experience_rag_service
 from app.services.ai.fallback_service import FallbackService
 from app.services.ai.rag import CultureRagService, get_culture_rag_service
 from app.services.ai.review_summary import ReviewSummaryService
+from app.services.ai.recommendation_filters import RecommendationFilters, extract_region_candidates
 
 router = APIRouter(dependencies=[Depends(verify_internal_api_key)])
 logger = logging.getLogger(__name__)
@@ -137,12 +139,11 @@ def review_summary(payload: ReviewSummaryRequest, request: Request) -> dict[str,
         ) from error
 
 
-class RecommendationRequest(BaseModel):
+class RecommendationRequest(RecommendationFilters):
     freeText: str = Field(min_length=1, max_length=500)
     companionType: str = Field(default="OTHER")
     headCount: int = Field(default=2, ge=1, le=100)
     interests: list[str] = Field(default_factory=list, max_length=10)
-    region: str | None = Field(default=None)
     timePreference: str = Field(default="ANYTIME")
     conversationHistory: list[dict[str, str]] = Field(default_factory=list, max_length=20)
     locale: str = Field(default="ko")
@@ -177,7 +178,30 @@ def get_recommendations(
 
         query = " ".join(query_parts)
 
-        response = service.recommend(db, query, payload.locale, limit=5)
+        filters = RecommendationFilters.resolve(payload.freeText,
+            region=payload.region, maxPrice=payload.maxPrice,
+            maxDurationMinutes=payload.maxDurationMinutes, headCount=payload.headCount,
+            technique=payload.technique, heritageItemId=payload.heritageItemId,
+        )
+        if "region" in payload.model_fields_set:
+            filters.region = payload.region
+        if "region" not in payload.model_fields_set and len(extract_region_candidates(payload.freeText)) > 1:
+            return {
+                "answer": "여러 지역이 포함되어 있습니다. 검색할 지역을 하나 선택해 주세요.",
+                "recommendedExperienceIds": [], "reasons": {}, "matchingKeywords": [],
+                "sources": [], "fallback": False, "message": "지역 조건 확인 필요",
+                "appliedFilters": filters.model_dump(exclude_none=True), "connectionEvidence": {},
+            }
+        # Do not silently ignore monetary constraints the limited parser cannot
+        # represent (for example total-party budgets and fractional 만 amounts).
+        if re.search(r"[0-9].*(?:원|만원)", payload.freeText) and filters.maxPrice is None:
+            return {
+                "answer": "예산 기준을 확인해야 합니다. 체험 가격의 상한을 알려주세요. 총예산인지 1인당 예산인지도 구분해 주세요.",
+                "recommendedExperienceIds": [], "reasons": {}, "matchingKeywords": [],
+                "sources": [], "fallback": False, "message": "예산 조건 확인 필요",
+                "appliedFilters": filters.model_dump(exclude_none=True), "connectionEvidence": {},
+            }
+        response = service.recommend(db, query, payload.locale, limit=5, filters=filters)
 
         logger.info(
             "AI recommendation request completed",
@@ -195,6 +219,8 @@ def get_recommendations(
             "sources": response.get("sources", []),
             "fallback": False,
             "message": None,
+            "appliedFilters": filters.model_dump(exclude_none=True),
+            "connectionEvidence": response.get("connectionEvidence", {}),
         }
 
     except HTTPException as error:
@@ -212,7 +238,7 @@ def get_recommendations(
             "fallback": True,
             "message": "AI 서비스가 일시적으로 불안정합니다.",
         }
-    except Exception as error:
+    except Exception:
         logger.exception("AI recommendation failed unexpectedly", extra={"request_id": request_id})
         return {
             "answer": "현재 AI 서비스와의 연결이 원활하지 않아요.",

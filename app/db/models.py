@@ -92,3 +92,22 @@ class Experience(Base):
         Index('ix_experiences_is_active', 'is_active'),
         Index('ix_experiences_category', 'category'),
     )
+
+
+class ExperienceCultureLink(Base):
+    """AI-owned reviewed links; Spring owns the referenced experiences."""
+    __tablename__ = "experience_culture_links"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    experience_id = Column(BigInteger, ForeignKey("experiences.id", ondelete="CASCADE"), nullable=False)
+    heritage_item_id = Column(BigInteger, ForeignKey("heritage_items.id", ondelete="CASCADE"), nullable=False)
+    technique = Column(String(100), nullable=False)
+    relation_kind = Column(String(30), nullable=False)
+    evidence_url = Column(Text, nullable=False)
+    evidence_excerpt = Column(Text, nullable=False)
+    review_status = Column(String(20), nullable=False, default="pending")
+    checked_at = Column(DateTime, nullable=False)
+
+    __table_args__ = (
+        Index("ix_experience_culture_links_lookup", "technique", "review_status", "experience_id"),
+    )

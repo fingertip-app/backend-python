@@ -504,14 +504,14 @@ class CultureRagService:
 
             # Ceramics (도자기)
             "백자": "백자",
-            "청자": "백자",
-            "도자기": "백자",
-            "도예": "백자",
-            "사기장": "백자",
+            "청자": "도자기",
+            "도자기": "도자기",
+            "도예": "도자기",
+            "사기장": "도자기",
             "물레": "물레체험",
             "빚기": "물레체험",
             "핸드빌딩": "핸드빌딩",
-            "달항아리": "백자",
+            "달항아리": "도자기",
 
             # Embroidery
             "자수": "궁중자수",
@@ -539,8 +539,6 @@ class CultureRagService:
         mapped_tags = set()
 
         for term in heritage_terms:
-            term_lower = term.lower()
-
             # Direct mapping
             if term in MAPPING:
                 mapped_tags.add(MAPPING[term])

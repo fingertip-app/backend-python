@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-10-18",
+  "scope": "도자기 / 전국 수집 후 지역 필터",
+  "purpose": "검토용 조사 데이터. 서비스 DB에 적재하지 않음",
+  "candidates": [
+    {
+      "researchId": "kocef-family-table-2026",
+      "title": "한 상, 한 흙",
+      "region": {"sido": "경기도", "sigungu": "광주시"},
+      "venue": "경기도자박물관 Clay Play 교육체험 2번 강의실",
+      "sourceUrl": "https://kocef.org/html/apply_view.html?b_idx=ODMg&gotopage=1&gubun=0&orderby=&orderbyf=&sb_div=1&search=&shenddate=&shstartdate=&str=",
+      "evidence": {
+        "method": "공식 상세 페이지 본문",
+        "age": "6세 이상",
+        "party": "3~4인 가족",
+        "duration": "90분",
+        "price": "수강료 40,000원",
+        "period": "2026-09-19 ~ 2026-11-01",
+        "schedule": "주말 및 공휴일, 13:00 또는 15:00 시작",
+        "activity": "전통 도자 문양의 의미 학습 및 가족 문양 구상"
+      },
+      "minAge": 6,
+      "minPartySize": 3,
+      "maxPartySize": 4,
+      "durationMinutes": 90,
+      "listedPriceKrw": 40000,
+      "priceUnit": null,
+      "listedStatus": "접수중",
+      "realTimeAvailability": "unverified",
+      "potteryType": null,
+      "wheelThrowingConfirmed": null,
+      "instructor": null,
+      "officialHeritageQualification": null,
+      "firingIncluded": null,
+      "collectionLeadDays": null,
+      "shippingCostKrw": null,
+      "supportedLanguages": null,
+      "appExperienceId": null,
+      "appBookable": false,
+      "reviewStatus": "partial",
+      "notes": ["수강료의 인당/가족당 단위를 추정하지 않음", "개별 잔여석과 강사 확인 필요", "일반 도자 교육이며 전통 장인의 직접 수업으로 단정하지 않음"]
+    },
+    {
+      "researchId": "kocef-donghun-workshop",
+      "title": "백자공방 동훈",
+      "region": {"sido": "경기도", "sigungu": "광주시"},
+      "sourceUrl": "https://kocef.org/html/?menuid=kcf0203",
+      "profileUrl": "https://www.kocef.org/html/?menuid=kcf01020605",
+      "person": "한민우",
+      "evidence": {"method": "공식 공방 목록 본문", "relation": "공방명·작가명·체험예약 링크가 함께 안내됨"},
+      "personRole": "도자공예작가",
+      "officialHeritageQualification": null,
+      "classInstructorConfirmed": null,
+      "specificExperience": null,
+      "priceKrw": null,
+      "realTimeAvailability": "unverified",
+      "appExperienceId": null,
+      "appBookable": false,
+      "reviewStatus": "lead_only",
+      "notes": ["공방명만으로 개별 수업의 백자 제작·전통 기법·작가 직접 진행을 확정하지 않음", "예약 링크 직접 열기에 실패하여 운영 조건 추가 확인 필요"]
+    }
+  ]
+}
