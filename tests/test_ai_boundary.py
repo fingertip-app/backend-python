@@ -6,7 +6,8 @@ def test_fastapi_ai_schema_tables_defined():
     """AI 스키마와 Spring 소유 체험 테이블의 추천용 매핑을 등록한다"""
     tables = {table.name for table in Base.metadata.tables.values()}
     # experiences is mapped for recommendation reads; its base table is created by Spring.
-    expected = {"heritage_items", "vector_documents", "embedding_metadata", "experiences"}
+    expected = {"heritage_items", "vector_documents", "embedding_metadata", "experiences",
+                "experience_culture_links"}
     assert tables == expected
 
 
